@@ -32,8 +32,8 @@ For each finding, in every findings file:
      lies inside the scope, the answer is **yes**.
    - If the fix requires changing something outside it (a contract, a shared file,
      pre-existing code the task did not allow the PR to touch), the answer is **no**. Do
-     not reject the finding: keep it as a finding for the owner, as the finding schema
-     defines. Set "Introduced by this PR" to `for the owner` and cap the severity at minor.
+     not reject the finding: keep it, set its action to `for the owner` (step 8) and cap
+     the severity at minor.
    - A finding with one fix inside the scope and another outside it is a **yes**: the PR
      could have done the in-scope one.
 5. **Is it already machine-enforced?** If the manifest lists a linter, type checker or CI
@@ -53,10 +53,21 @@ For each finding, in every findings file:
    that row. If the facts you verified changed (part of the claim fell away), re-grade
    what remains against the table. "Both levels are defensible" is a reason to keep the
    reviewer's level, not to change it.
+8. **Who acts on it?** Settle the "Action" field, using the table in the finding schema.
+   The authoring agent will fix everything marked `fix now` without asking, so be strict:
+   - `for the owner` when step 4 answered no.
+   - `needs owner decision` when the right outcome is not settled by the spec, a documented
+     rule or the code: two sources conflict, the spec is silent on the behaviour, or the
+     suggested fix begins with "decide", "confirm" or "ask". Make sure "Decision needed"
+     states the question and the options. If the finding also has a part that is right
+     under every option (a missing test, a record of the decision), split that part out as
+     its own `fix now` finding with a suffixed ID (`SPEC-2a`).
+   - `fix now` otherwise. Its "Suggested fix" must be something the agent can do without
+     making a product decision; rewrite it if it is not.
 
 Then, across all files:
 
-8. **Deduplicate.** Merge two findings only when they point at the same code and the same
+9. **Deduplicate.** Merge two findings only when they point at the same code and the same
    fix would resolve both: keep one, keep the clearest evidence, and list the other ID as
    merged into it. The same problem at several locations is one finding with several
    locations. Two findings that share a cause but need different fixes (the code and the
@@ -81,8 +92,8 @@ fields added:>
 
 ## Minor findings table
 
-| ID | Severity | Location | Problem | Suggested fix |
-|---|---|---|---|---|
+| ID | Severity | Action | Location | Problem | Suggested fix or decision needed |
+|---|---|---|---|---|---|
 <one row per confirmed minor finding and nit; one sentence per cell; "None." if there are none>
 
 ## Rejected findings
@@ -108,10 +119,11 @@ The report is assembled from this file by a script that finds sections by their 
 so use exactly these `##` and `###` headings, in this order, and no other `##` headings.
 
 - Order the confirmed findings by severity, blockers first.
-- In the minor findings table, write the severity of a finding for the owner as
-  `minor (for the owner)`.
-- The minor findings table is what the report shows for minors and nits. Keep each row to
-  one line; the full blocks above remain the record.
+- The minor findings table is what the report shows for minors and nits, and the script
+  sorts its rows into the report's three groups by the Action cell. Write that cell as
+  exactly `fix now`, `needs owner decision` or `for the owner`. Keep each row to one line;
+  the full blocks above remain the record. For a `needs owner decision` row, the last cell
+  is the question and its options.
 - Under "Reviewer tables", copy each reviewer's table of that name, corrected where a
   rejection or adjustment changes a row. Write `Not produced.` under a heading whose
   reviewer supplied no table.

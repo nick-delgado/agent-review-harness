@@ -1,11 +1,14 @@
-# Report layout
+# Output layout
 
-The report is one GitHub comment. It is read top-down by someone deciding whether to merge,
-so the decision and the findings come first and the audit trail sits in collapsed sections
-underneath.
+A review has two outputs, for two readers.
 
-`scripts/assemble-report.sh <RUN_DIR>` builds it. You write two small files; the script
-copies everything else from the phase outputs, unchanged.
+| Output | Where | Reader | Holds |
+|---|---|---|---|
+| The report | One comment on the PR | The agent that will fix the PR, and the person who merges it | The verdict, the code findings grouped by who acts on them, spec alignment, evidence of review |
+| Process findings | One comment per reviewed PR on the tracking issue labelled `agent-process` | The owner of the project's agent setup | The inferred cause of each finding, patterns, proposals |
+
+`scripts/assemble-report.sh` builds both from the phase outputs, unchanged. You write two
+small files for the report.
 
 ## What you write
 
@@ -16,8 +19,8 @@ copies everything else from the phase outputs, unchanged.
 
 **PR:** #<n> <title> · **Head:** `<short sha>` · **CI:** <passing | failing: names | pending | none> · **Spec:** <issue #m (link) | path/to/spec.md | none found>
 
-<Two or three sentences: what the PR does, the most important problem, and the main thing
-the cause analysis points at.>
+<Two or three sentences: what the PR does and the most important problems. Code only: say
+nothing here about causes or process.>
 
 Confirmed findings after verification (<reported> reported, <confirmed> confirmed, <merged> merged, <rejected> rejected):
 
@@ -28,7 +31,9 @@ Confirmed findings after verification (<reported> reported, <confirmed> confirme
 | Spec alignment | | | | |
 | Test adequacy | | | | |
 
-<If proposals exist that edit a doc, prompt or skill:> A PR with the proposed doc and skill changes can be opened on request.
+By action: <n> to fix now, <n> waiting for the owner's decision, <n> for the owner.
+
+Why these issues arose, and proposed changes to the project's agent setup: <URL of the tracking-issue comment, or "not analysed (no findings above nit)">
 ```
 
 Count each confirmed finding under the reviewer whose ID it kept. Take the numbers from
@@ -53,36 +58,47 @@ the verification summary in `verified.md`; do not recount by hand.
 | **Changes recommended** | no blocker, at least one confirmed major |
 | **Acceptable** | only minor findings and nits, or none |
 
-Findings marked `for the owner` (real gaps the PR could not have fixed within its allowed
-scope) do not count toward the verdict.
+Findings whose action is `for the owner` do not count toward the verdict. Findings that
+need the owner's decision do.
 
 Add `— limited review` to the verdict when spec alignment was not reviewable or a reviewer
 could not complete. The verdict is a recommendation to the human who merges.
 
 ## What the script assembles
 
-| Report section | Taken from |
+### The report (`assemble-report.sh <RUN_DIR> report`)
+
+| Section | Taken from |
 |---|---|
-| Header, summary, counts | `report-head.md` |
-| Findings (blocker and major, full blocks) | `verified.md` → Confirmed findings |
-| Minor findings and nits (collapsed table) | `verified.md` → Minor findings table |
+| Header, summary, counts, link to the process findings | `report-head.md` |
+| Fix now | `verified.md`: confirmed findings and minor-table rows whose action is `fix now` |
+| Needs the owner's decision | the same, for `needs owner decision` |
+| For the owner (no action in this PR) | the same, for `for the owner` |
 | Spec alignment (traceability, unrequested changes) | `verified.md` → Reviewer tables |
-| Why this happened (cause per finding, patterns, not explained) | `root-cause.md` → Cause summary, Patterns, Not explained |
-| Proposed process improvements | `root-cause.md` → Proposals |
 | Evidence of review: counts of checks, searches and skipped items per reviewer | `findings/*.md` |
 | Not reviewed (collapsed, always in full) | `findings/*.md` → 3. Not reviewed |
 | Findings rejected or merged in verification (collapsed, always in full) | `verified.md` |
 | Every check performed (collapsed, only when it fits) | `findings/*.md`, `verified.md` → Behaviour coverage |
 | Run metadata (collapsed) | `report-meta.md` |
 
+In each of the three groups, blockers and majors appear as full blocks and minors and nits
+as table rows. The three group headings are fixed: the `address-pr-review` skill finds its
+work by them.
+
+### Process findings (`assemble-report.sh <RUN_DIR> process <n> <head-sha>`)
+
+| Section | Taken from |
+|---|---|
+| Causes (one line per finding), patterns, not explained | `root-cause.md` → Cause summary, Patterns, Not explained |
+| Proposals | `root-cause.md` → Proposals |
+
 ## Length
 
-GitHub limits a comment to 65,536 characters. The script keeps the report under 60,000:
+GitHub limits a comment to 65,536 characters. The script keeps each output under 60,000:
 
 1. It builds the report with the full check tables.
 2. If that is too long, it leaves the check tables out and says so in the run metadata. The
    per-reviewer counts, the "Not reviewed" list and the rejected findings always stay.
-3. If it is still too long, it fails and prints the size of each section. Shorten the
-   largest section in its source file (usually the proposals in `root-cause.md`) and run it
-   again. Never shorten blocker or major findings, the "Not reviewed" list, or the rejected
-   findings.
+3. If an output is still too long, it fails and prints the size of each section. Shorten
+   the largest section in its source file and run it again. Never shorten blocker or major
+   findings, the "Not reviewed" list, or the rejected findings.

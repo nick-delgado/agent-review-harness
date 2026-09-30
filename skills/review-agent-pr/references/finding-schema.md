@@ -22,7 +22,9 @@ One block per finding. If there are none, write `No findings.` under the heading
 - **Measured against:** <source path:line or URL> — "<the rule, spec clause or precedent, quoted exactly>"
 - **Why it matters:** <the concrete consequence, in one or two sentences>
 - **Suggested fix:** <what to change; name the existing function, pattern or doc to use>
-- **Introduced by this PR:** yes | worsened | pre-existing (only report pre-existing when the PR depended on it) | for the owner (see below)
+- **Introduced by this PR:** yes | worsened | pre-existing (only report pre-existing when the PR depended on it)
+- **Action:** fix now | needs owner decision | for the owner (see "Who acts on a finding")
+- **Decision needed:** <only for "needs owner decision": the question, and the options with what each would change>
 ```
 
 IDs use the reviewer's prefix and a running number: `STD-1`, `SMELL-1`, `SPEC-1`, `TEST-1`.
@@ -49,17 +51,20 @@ way:
 | A decision the spec left open, made sensibly and easy to reverse | minor |
 | A deviation supported only by precedent, with no written rule | minor at most |
 
-### Findings for the owner
+### Who acts on a finding
 
-Sometimes the PR exposes a real gap that it could not have fixed: the fix lies in a
-contract, shared file or pre-existing code that the task did not allow the PR to change
-(for example, outside the issue's owned paths). Report it, because the owner needs to know,
-with:
+The report is read by the agent that wrote the PR, which will fix what it is told to fix,
+and by the project's owner. The "Action" field tells them apart. Get it right: an agent
+that acts on a question only the owner can answer is guessing a second time.
 
-- **Introduced by this PR:** `for the owner`, and one sentence on why the PR could not fix it;
-- severity capped at minor.
+| Action | When | What happens next |
+|---|---|---|
+| `fix now` | The right outcome is settled by the spec, a documented rule or the code itself, and the fix lies within what the task allowed the PR to change. | The authoring agent fixes it. |
+| `needs owner decision` | The fix depends on a choice the spec does not settle: two sources conflict, the spec left a behaviour open, or the finding questions a decision the agent made. Fill in "Decision needed". | The owner answers on the PR; only then does the agent act. |
+| `for the owner` | The gap is real and the PR exposes it, but the fix lies in a contract, shared file or pre-existing code that the task did not allow the PR to change (for example, outside the issue's owned paths). Say in "Why it matters" why the PR could not fix it. Severity is capped at minor. | Nothing in this PR. It does not count toward the verdict. |
 
-These findings do not count toward the verdict.
+If part of a finding can be fixed now and part needs a decision, split it into two
+findings.
 
 ### Rules for a valid finding
 

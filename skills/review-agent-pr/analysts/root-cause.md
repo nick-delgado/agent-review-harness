@@ -157,10 +157,13 @@ prevented.
 
 ### Length and headings
 
-The report is one GitHub comment, assembled by a script that finds sections by heading. Use
-exactly the five `##` headings above, in that order. "Cause analysis" is the full record and
-stays in the run directory. The other four sections are copied into the report as written,
-so they must be short:
+Your output is posted as one comment on the project's tracking issue for agent process
+findings, assembled by a script that finds sections by heading. Use exactly the five `##`
+headings above, in that order. "Cause analysis" is the full record and stays in the run
+directory. The other four sections are copied into the comment as written, so they must be
+short. A later step reads these comments across many reviews to decide which changes are
+worth making, so name causes with the taxonomy IDs exactly and make each proposal
+understandable without the rest of the review:
 
 - **Cause summary:** one line per blocker, major and minor.
 - **Patterns:** one line per pattern.
