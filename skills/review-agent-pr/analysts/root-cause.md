@@ -22,11 +22,24 @@ Every cause you name is an inference, and must be labelled with how strong the e
 - `<SKILL_DIR>/references/cause-taxonomy.md`: the causes you may assign and the evidence
   each requires. Read it first.
 
+## Depth by severity
+
+Spend the effort where a process change would pay for itself.
+
+| Severity | Analysis | Proposals |
+|---|---|---|
+| blocker, major | Full: steps 1 and 2 below, with a "Cause analysis" block each. | Yes. |
+| minor | One line: the primary cause and one sentence of evidence, in the "Cause summary" table only. Assign it from what you learned analysing the blockers and majors plus one targeted look; if no cause is evident, write `not assigned`. | Only as part of a pattern: two or more minors with the same cause, or a minor that shares its cause with a blocker or major. |
+| nit | None. List the IDs in one line under the "Cause summary" table. | Never. |
+
+Minors are kept because they reveal patterns: three small guesses caused by one silent spec
+are one real problem.
+
 ## Method
 
 ### 1. Reconstruct what the agent could see
 
-For each confirmed finding, establish:
+For each blocker and major finding, establish:
 
 - **What instruction covered this?** Search the inventory for anything that speaks to the
   issue. Quote it with `path:line`, or state that nothing does and list what you searched.
@@ -43,7 +56,8 @@ For each confirmed finding, establish:
 
 ### 2. Assign causes
 
-Give each finding one primary cause and any contributing causes, from the taxonomy. Apply
+Give each blocker and major one primary cause and any contributing causes, from the
+taxonomy; give each minor a primary cause only. Apply
 its evidence requirements strictly, and apply the counterfactual test: *if this one thing
 had been different, would a competent agent have plausibly produced the right result?* If
 the answer is no, it is not the cause.
@@ -73,7 +87,7 @@ For each cause or pattern worth acting on, write a concrete proposal. Rules:
 - **Prefer a mechanical guardrail to more prose.** A lint rule, a type, a test or a CI check
   cannot be skimmed past. If the issue can be detected mechanically, propose that first, and
   propose prose only as a complement.
-- **Answer the test question for every finding:** could a unit, integration or
+- **Answer the test question for every blocker and major:** could a unit, integration or
   architectural test have caught this? If yes, describe the test: what it asserts, where it
   lives, and why it would have failed on this PR.
 - **Edit before adding.** Fix or sharpen the existing sentence, or move it to where the
@@ -91,6 +105,7 @@ For each cause or pattern worth acting on, write a concrete proposal. Rules:
 ```markdown
 ## Cause analysis
 
+<one block per blocker and major finding>
 ### <Finding ID>: <finding title>
 - **Primary cause:** <taxonomy id>
 - **Contributing:** <taxonomy ids, or "none">
@@ -103,7 +118,9 @@ For each cause or pattern worth acting on, write a concrete proposal. Rules:
 
 | Finding | Primary cause | Confidence | Evidence |
 |---|---|---|---|
-<one row per finding; the evidence cell is one sentence with its path:line>
+<one row per blocker, major and minor; the evidence cell is one sentence with its path:line>
+
+Nits, not analysed: <IDs, or "none">
 
 ## Patterns
 
@@ -140,7 +157,7 @@ exactly the five `##` headings above, in that order. "Cause analysis" is the ful
 stays in the run directory. The other four sections are copied into the report as written,
 so they must be short:
 
-- **Cause summary:** one line per finding.
+- **Cause summary:** one line per blocker, major and minor.
 - **Patterns:** one line per pattern.
 - **Proposals:** the whole section under 9,000 characters. Per proposal, "Expected effect"
   and "Cost and risk" are one sentence each, and the diff contains only the changed lines

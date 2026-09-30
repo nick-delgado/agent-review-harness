@@ -170,15 +170,17 @@ Only findings in the confirmed list go forward. The rejected list is published i
 
 Spawn one fresh subagent with `analysts/root-cause.md` as its brief. It also reads
 `references/cause-taxonomy.md`. It takes `RUN_DIR/verified.md` and the manifest's agent
-process inventory and writes `RUN_DIR/root-cause.md`: for each confirmed finding, what in the
-project's docs, skills, prompts, specs, precedents or guardrails most plausibly led the
-agent there, and a set of concrete improvement proposals.
+process inventory and writes `RUN_DIR/root-cause.md`: what in the project's docs, skills,
+prompts, specs, precedents or guardrails most plausibly led the agent to each finding, and
+a set of concrete improvement proposals. Depth follows severity: blockers and majors get a
+full analysis, minors a one-line cause that feeds the patterns, nits none.
 
 Only the PR is available, not the agent's prompt or transcript, so every cause is an
 inference. The brief requires each one to be labelled with its confidence and supporting
 evidence. Keep those labels in the report.
 
-Skip this phase, and say so in the report, when there are no confirmed findings.
+Skip this phase, and say so in the report, when there are no confirmed findings or only
+nits.
 
 ## Phase 7: Report
 
