@@ -21,13 +21,24 @@ For each finding, in every findings file:
    check that no later issue comment changed it.
 3. **Is it this PR's doing?** Check the location against `<RUN_DIR>/diff.patch`. If the
    lines were not added or changed by the PR and the PR did not rely on them, reject as
-   pre-existing. If the gap is real and the PR exposes it, but the fix lies in a contract,
-   shared file or pre-existing code the task did not allow the PR to change, do not reject:
-   keep it as a finding for the owner, as the finding schema defines (marked `for the
-   owner`, capped at minor).
-4. **Is it already machine-enforced?** If the manifest lists a linter, type checker or CI
+   pre-existing.
+4. **Could the PR have fixed it within its allowed scope?** Answer this for every finding
+   that survived step 3, and record the answer in the finding (see the output format).
+   - Establish the allowed scope once, from the spec material: the issue's owned paths or
+     stated scope, files it says not to touch, contracts or shared files it says need
+     sign-off. If the task states no limits, the scope is the whole repository and the
+     answer is always yes.
+   - Then look at where the finding's fix would have to be made. If every reasonable fix
+     lies inside the scope, the answer is **yes**.
+   - If the fix requires changing something outside it (a contract, a shared file,
+     pre-existing code the task did not allow the PR to touch), the answer is **no**. Do
+     not reject the finding: keep it as a finding for the owner, as the finding schema
+     defines. Set "Introduced by this PR" to `for the owner` and cap the severity at minor.
+   - A finding with one fix inside the scope and another outside it is a **yes**: the PR
+     could have done the in-scope one.
+5. **Is it already machine-enforced?** If the manifest lists a linter, type checker or CI
    check that covers it, reject: CI reports it.
-5. **Look for the counter-evidence the reviewer may have missed.**
+6. **Look for the counter-evidence the reviewer may have missed.**
    - "Unused" or "dead": search for call sites, dynamic references, registrations, exports
      consumed elsewhere.
    - "Duplicate of X": read both. Same behaviour, or only similar names?
@@ -37,7 +48,7 @@ For each finding, in every findings file:
    - "Scope creep": is the change needed for a requirement to work?
    - "Swallowed error" or "needless defence": is there a caller or a documented contract
      that makes it necessary?
-6. **Is the severity right?** Keep the reviewer's severity unless a row of the severity
+7. **Is the severity right?** Keep the reviewer's severity unless a row of the severity
    table or the boundary cases in the finding schema says otherwise. To change it, quote
    that row. If the facts you verified changed (part of the claim fell away), re-grade
    what remains against the table. "Both levels are defensible" is a reason to keep the
@@ -45,7 +56,7 @@ For each finding, in every findings file:
 
 Then, across all files:
 
-7. **Deduplicate.** Merge two findings only when they point at the same code and the same
+8. **Deduplicate.** Merge two findings only when they point at the same code and the same
    fix would resolve both: keep one, keep the clearest evidence, and list the other ID as
    merged into it. The same problem at several locations is one finding with several
    locations. Two findings that share a cause but need different fixes (the code and the
@@ -64,6 +75,7 @@ steps above.
 <each surviving finding in the finding-schema block format, original ID kept, with these
 fields added:>
 - **Verification:** confirmed | confirmed, adjusted (<what changed and why>)
+- **Fixable within the PR's scope:** yes | no — <where the fix would be made, and the scope statement that allows or forbids it>
 - **Checked by verifier:** <the specific things you opened or searched to try to refute it>
 - **Merged:** <other IDs folded into this one, or "none">
 
