@@ -186,6 +186,18 @@ build_report() {
   echo
   group "for the owner"
 
+  local previous
+  previous="$(h2 "$verified" "Previous findings" | trim)"
+  case "$previous" in
+    "" | "No previous review."*) ;;
+    *)
+      printf '\n### Previous findings\n\n'
+      echo "What became of each finding from the previous review, checked against this commit."
+      echo
+      printf '%s\n' "$previous"
+      ;;
+  esac
+
   printf '\n### Spec alignment\n\n'
   h3 "$verified" "Spec traceability" | trim | or_default "Not reviewable: no spec found."
   printf '\n**Unrequested changes**\n\n'
@@ -217,6 +229,13 @@ build_report() {
   h2 "$verified" "Rejected findings" | trim | or_default "None."
   printf '\n**Verification summary**\n\n'
   h2 "$verified" "Verification summary" | trim
+  printf '\n</details>\n'
+
+  local spot spot_count
+  spot="$(h2 "$verified" "Spot checks" | trim)"
+  spot_count="$(printf '%s\n' "$spot" | rows)"
+  printf '\n<details>\n<summary>Passed checks re-checked by the verifier (%s)</summary>\n\n' "$spot_count"
+  printf '%s\n' "$spot" | or_default "None."
   printf '\n</details>\n'
 
   if [ "$with_tables" = "yes" ]; then
@@ -272,7 +291,7 @@ case "$mode" in
     for required in "$run/report-head.md" "$run/report-meta.md" "$verified"; do
       [ -s "$required" ] || { echo "error: missing or empty $required" >&2; exit 1; }
     done
-    need "$verified" "Confirmed findings" "Minor findings table" "Rejected findings" "Verification summary" "Reviewer tables"
+    need "$verified" "Confirmed findings" "Minor findings table" "Rejected findings" "Spot checks" "Previous findings" "Verification summary" "Reviewer tables"
     fail_if_missing
     confirmed="$(h2 "$verified" "Confirmed findings")"
     case "$confirmed" in

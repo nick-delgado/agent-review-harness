@@ -80,8 +80,12 @@ One general comment on the PR, updated in place on a re-run. It holds code findi
   - **For the owner:** real gaps the PR exposes but was not allowed to fix. No action in
     this PR, and no effect on the verdict.
 - a spec traceability table;
+- on a re-review, what became of each earlier finding (resolved, still present, decided),
+  checked against the new commit, not taken from the agent's word;
 - evidence of review: how many checks and searches each reviewer recorded, what was not
-  reviewed and why, and what the verifier rejected or merged. The full table of every check
+  reviewed and why, what the verifier rejected or merged, and a sample of passed checks
+  that the verifier re-checked. Every `file:line` citation is checked by a script against
+  the code at the reviewed commit. The full table of every check
   is included when it fits in one comment, and is always kept in the run directory.
 
 ## The tracking issue
@@ -198,6 +202,8 @@ skills/
     scripts/assemble-report.sh       builds the PR comment and the tracking-issue comment
     scripts/post-report.sh           creates or updates the PR comment
     scripts/post-process-findings.sh creates or updates the tracking-issue comment
+    scripts/get-previous.sh          saves the previous report and response for a re-review
+    scripts/check-citations.sh       checks every file:line citation against the code
   address-pr-review/
     SKILL.md
     scripts/get-review.sh            prints the latest review report on a PR
