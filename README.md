@@ -117,6 +117,24 @@ the agent being reviewed.
 
 ## Install
 
+### With the skills CLI
+
+From the root of the project you want the skills in:
+
+```sh
+npx skills add nick-delgado/agent-review-harness                       # choose skills and agents interactively
+npx skills add nick-delgado/agent-review-harness --list                # see what is available
+npx skills add nick-delgado/agent-review-harness -a claude-code -a codex -a antigravity
+npx skills add nick-delgado/agent-review-harness -s address-pr-review  # one skill
+npx skills add nick-delgado/agent-review-harness -g                    # your user-level directories
+npx skills update                                                      # later, to pull new versions
+```
+
+It installs the skills to `.agents/skills/` (read by Codex and Antigravity) and links them
+into `.claude/skills/` for Claude Code. Pass `--copy` if you want plain copies to commit.
+
+### With the install script
+
 Clone this repository next to the project, then:
 
 ```sh
