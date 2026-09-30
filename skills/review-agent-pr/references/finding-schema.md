@@ -22,7 +22,7 @@ One block per finding. If there are none, write `No findings.` under the heading
 - **Measured against:** <source path:line or URL> — "<the rule, spec clause or precedent, quoted exactly>"
 - **Why it matters:** <the concrete consequence, in one or two sentences>
 - **Suggested fix:** <what to change; name the existing function, pattern or doc to use>
-- **Introduced by this PR:** yes | worsened | pre-existing (only report pre-existing when the PR depended on it)
+- **Introduced by this PR:** yes | worsened | pre-existing (only report pre-existing when the PR depended on it) | for the owner (see below)
 ```
 
 IDs use the reviewer's prefix and a running number: `STD-1`, `SMELL-1`, `SPEC-1`, `TEST-1`.
@@ -35,6 +35,31 @@ IDs use the reviewer's prefix and a running number: `STD-1`, `SMELL-1`, `SPEC-1`
 | major | Should be fixed before merge: a clear violation of a documented standard, a missing requirement, duplicated logic that will drift, behaviour without a meaningful test. |
 | minor | Worth fixing, safe to merge without: local maintainability issues, weak but present tests, small unrequested changes. |
 | nit | Optional polish. Report at most five per reviewer. |
+
+Boundary cases, decided here so that every reviewer and the verifier grade them the same
+way:
+
+| Case | Severity |
+|---|---|
+| A test whose name, or the PR description, claims it covers something the test cannot detect | major (the claim is what makes it major: a reader will trust it) |
+| A test that is weak or incomplete but claims no more than it checks | minor |
+| A behaviour the spec asked for with no test at all | major |
+| Incidental code with no test | minor |
+| A spec requirement contradicted as written, even when the PR discloses it | major (disclosure goes in "Why it matters"; it does not lower the severity) |
+| A decision the spec left open, made sensibly and easy to reverse | minor |
+| A deviation supported only by precedent, with no written rule | minor at most |
+
+### Findings for the owner
+
+Sometimes the PR exposes a real gap that it could not have fixed: the fix lies in a
+contract, shared file or pre-existing code that the task did not allow the PR to change
+(for example, outside the issue's owned paths). Report it, because the owner needs to know,
+with:
+
+- **Introduced by this PR:** `for the owner`, and one sentence on why the PR could not fix it;
+- severity capped at minor.
+
+These findings do not count toward the verdict.
 
 ### Rules for a valid finding
 

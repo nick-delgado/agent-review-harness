@@ -21,7 +21,10 @@ For each finding, in every findings file:
    check that no later issue comment changed it.
 3. **Is it this PR's doing?** Check the location against `<RUN_DIR>/diff.patch`. If the
    lines were not added or changed by the PR and the PR did not rely on them, reject as
-   pre-existing.
+   pre-existing. If the gap is real and the PR exposes it, but the fix lies in a contract,
+   shared file or pre-existing code the task did not allow the PR to change, do not reject:
+   keep it as a finding for the owner, as the finding schema defines (marked `for the
+   owner`, capped at minor).
 4. **Is it already machine-enforced?** If the manifest lists a linter, type checker or CI
    check that covers it, reject: CI reports it.
 5. **Look for the counter-evidence the reviewer may have missed.**
@@ -34,14 +37,20 @@ For each finding, in every findings file:
    - "Scope creep": is the change needed for a requirement to work?
    - "Swallowed error" or "needless defence": is there a caller or a documented contract
      that makes it necessary?
-6. **Is the severity right?** Apply the severity table in the finding schema. Raise or lower
-   it and say why.
+6. **Is the severity right?** Keep the reviewer's severity unless a row of the severity
+   table or the boundary cases in the finding schema says otherwise. To change it, quote
+   that row. If the facts you verified changed (part of the claim fell away), re-grade
+   what remains against the table. "Both levels are defensible" is a reason to keep the
+   reviewer's level, not to change it.
 
 Then, across all files:
 
-7. **Deduplicate.** When two reviewers report the same underlying problem, keep one finding,
-   keep the clearest evidence, and list the other IDs as merged into it. The same root
-   problem at several locations is one finding with several locations.
+7. **Deduplicate.** Merge two findings only when they point at the same code and the same
+   fix would resolve both: keep one, keep the clearest evidence, and list the other ID as
+   merged into it. The same problem at several locations is one finding with several
+   locations. Two findings that share a cause but need different fixes (the code and the
+   missing record of a decision, say) stay separate; add a "Related:" line to each naming
+   the other.
 
 When you are unsure after checking, keep the finding and set its confidence to `low`. Do not
 reject because a finding is inconvenient or small; reject only for a stated reason from the
@@ -87,6 +96,8 @@ The report is assembled from this file by a script that finds sections by their 
 so use exactly these `##` and `###` headings, in this order, and no other `##` headings.
 
 - Order the confirmed findings by severity, blockers first.
+- In the minor findings table, write the severity of a finding for the owner as
+  `minor (for the owner)`.
 - The minor findings table is what the report shows for minors and nits. Keep each row to
   one line; the full blocks above remain the record.
 - Under "Reviewer tables", copy each reviewer's table of that name, corrected where a

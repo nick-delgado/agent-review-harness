@@ -35,6 +35,11 @@ Spend the effort where a process change would pay for itself.
 Minors are kept because they reveal patterns: three small guesses caused by one silent spec
 are one real problem.
 
+**A pattern is promoted.** When three or more minors share a primary cause, treat that
+cause as you would a major finding: do steps 1 and 2 in full for it, and write one "Cause
+analysis" block headed `### Pattern: <cause>` that covers the findings together. Proposals
+may then address it like any other.
+
 ## Method
 
 ### 1. Reconstruct what the agent could see
@@ -105,7 +110,7 @@ For each cause or pattern worth acting on, write a concrete proposal. Rules:
 ```markdown
 ## Cause analysis
 
-<one block per blocker and major finding>
+<one block per blocker and major finding, and one per promoted pattern>
 ### <Finding ID>: <finding title>
 - **Primary cause:** <taxonomy id>
 - **Contributing:** <taxonomy ids, or "none">

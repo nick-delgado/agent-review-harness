@@ -28,7 +28,9 @@ still pass, it is hollow.
 
 - No test at all: `untested-behaviour`. Major for a behaviour the spec asked for, minor for
   incidental code.
-- A test exists but would not fail: `hollow-test`, major.
+- A test exists but would not fail: `hollow-test`. Major when the test's name or the PR
+  description claims the coverage it does not give; minor when the test is merely weak and
+  claims no more than it checks.
 
 ### 3. Look for hollow tests
 

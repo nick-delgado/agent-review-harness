@@ -53,6 +53,9 @@ the verification summary in `verified.md`; do not recount by hand.
 | **Changes recommended** | no blocker, at least one confirmed major |
 | **Acceptable** | only minor findings and nits, or none |
 
+Findings marked `for the owner` (real gaps the PR could not have fixed within its allowed
+scope) do not count toward the verdict.
+
 Add `— limited review` to the verdict when spec alignment was not reviewable or a reviewer
 could not complete. The verdict is a recommendation to the human who merges.
 
