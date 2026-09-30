@@ -107,7 +107,10 @@ subagent reads it. List paths and one-line descriptions; do not paste file conte
 1. **PR facts**: number, title, URL, base and head SHAs, size, CI state, changed files
    grouped by area.
 2. **Spec sources** (task level) and **direction sources** (project level), from phase 2,
-   each with its path or URL, and what was not found or not accessible.
+   each with its path or URL, and what was not found or not accessible. On a re-review,
+   the owner's decisions on earlier findings are part of the task spec: they are recorded
+   in `RUN_DIR/previous/response.md` (the Decision column, or `decision:` notes). Reviewers
+   do not read that file, so state each decision here in one line.
 3. **Standards sources**: every document that tells a contributor how to build here.
    `AGENTS.md`, `CLAUDE.md`, `GEMINI.md` (root and nested ones on the path to any changed
    file), `CONTRIBUTING.md`, `README.md` sections on conventions, `docs/` pages on
