@@ -58,17 +58,37 @@ fields added:>
 - **Checked by verifier:** <the specific things you opened or searched to try to refute it>
 - **Merged:** <other IDs folded into this one, or "none">
 
+## Minor findings table
+
+| ID | Severity | Location | Problem | Suggested fix |
+|---|---|---|---|---|
+<one row per confirmed minor finding and nit; one sentence per cell; "None." if there are none>
+
 ## Rejected findings
 
 | ID | Reviewer's claim | Reason rejected | What was checked |
 |---|---|---|---|
 
+<then a second table, "Merged": ID, folded into, why>
+
 ## Verification summary
 
 | Reviewer | Reported | Confirmed | Adjusted | Merged | Rejected |
 |---|---|---|---|---|---|
+
+## Reviewer tables
+
+### Spec traceability
+### Unrequested changes
+### Behaviour coverage
 ```
 
-Copy each reviewer's extra tables (`Spec traceability`, `Unrequested changes`, `Behaviour
-coverage`) into a final section `## Reviewer tables`, corrected where a rejection or
-adjustment changes a row.
+The report is assembled from this file by a script that finds sections by their headings,
+so use exactly these `##` and `###` headings, in this order, and no other `##` headings.
+
+- Order the confirmed findings by severity, blockers first.
+- The minor findings table is what the report shows for minors and nits. Keep each row to
+  one line; the full blocks above remain the record.
+- Under "Reviewer tables", copy each reviewer's table of that name, corrected where a
+  rejection or adjustment changes a row. Write `Not produced.` under a heading whose
+  reviewer supplied no table.

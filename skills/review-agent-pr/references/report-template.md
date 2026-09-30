@@ -1,21 +1,49 @@
-# Report template
+# Report layout
 
 The report is one GitHub comment. It is read top-down by someone deciding whether to merge,
-so the decision and the findings come first, and the audit trail sits in collapsed sections
+so the decision and the findings come first and the audit trail sits in collapsed sections
 underneath.
 
-## Assembly rules
+`scripts/assemble-report.sh <RUN_DIR>` builds it. You write two small files; the script
+copies everything else from the phase outputs, unchanged.
 
-- Keep the first line exactly as shown: the posting script finds earlier reports by it.
-- Copy findings, tables and ledgers from `verified.md`, `root-cause.md` and
-  `findings/*.md`. Do not change severities, drop findings or paraphrase quotes.
-- A section with nothing in it stays, with the reason ("No spec found", "No confirmed
-  findings, so no cause analysis was run"). An absent section reads as an unperformed check.
-- GitHub limits a comment to 65,536 characters. If the report is over 60,000, trim in this
-  order and say in the run metadata what was trimmed: (1) coverage ledgers reduced to the
-  "Checks performed" tables; (2) nits reduced to a count; (3) minor findings reduced to the
-  table row without the detail block. Never trim blocker or major findings, rejected
-  findings, or the "Not reviewed" list.
+## What you write
+
+### `RUN_DIR/report-head.md`
+
+```markdown
+## Agent PR review: <verdict>
+
+**PR:** #<n> <title> · **Head:** `<short sha>` · **CI:** <passing | failing: names | pending | none> · **Spec:** <issue #m (link) | path/to/spec.md | none found>
+
+<Two or three sentences: what the PR does, the most important problem, and the main thing
+the cause analysis points at.>
+
+Confirmed findings after verification (<reported> reported, <confirmed> confirmed, <merged> merged, <rejected> rejected):
+
+| | Blocker | Major | Minor | Nit |
+|---|---|---|---|---|
+| Standards | | | | |
+| Code smells | | | | |
+| Spec alignment | | | | |
+| Test adequacy | | | | |
+
+<If proposals exist that edit a doc, prompt or skill:> A PR with the proposed doc and skill changes can be opened on request.
+```
+
+Count each confirmed finding under the reviewer whose ID it kept. Take the numbers from
+the verification summary in `verified.md`; do not recount by hand.
+
+### `RUN_DIR/report-meta.md`
+
+```markdown
+- Reviewed commit: `<full head sha>` against `<base ref>`
+- Reviewing agent and model: <tool, model>
+- Reviewers: standards, code-smells, spec-alignment, test-adequacy; verifier; root-cause analyst
+- Isolation: <parallel subagents with fresh context | none (sequential, shared context)>
+- Tests, linters and builds were not run by this review; CI status is reported as found.
+- <Anything that did not complete: a reviewer that failed, a phase skipped, and why.>
+```
 
 ## Verdict
 
@@ -28,117 +56,30 @@ underneath.
 Add `— limited review` to the verdict when spec alignment was not reviewable or a reviewer
 could not complete. The verdict is a recommendation to the human who merges.
 
-## Template
+## What the script assembles
 
-````markdown
-<!-- agent-pr-review:report -->
-## Agent PR review: <verdict>
+| Report section | Taken from |
+|---|---|
+| Header, summary, counts | `report-head.md` |
+| Findings (blocker and major, full blocks) | `verified.md` → Confirmed findings |
+| Minor findings and nits (collapsed table) | `verified.md` → Minor findings table |
+| Spec alignment (traceability, unrequested changes) | `verified.md` → Reviewer tables |
+| Why this happened (cause per finding, patterns, not explained) | `root-cause.md` → Cause summary, Patterns, Not explained |
+| Proposed process improvements | `root-cause.md` → Proposals |
+| Evidence of review: counts of checks, searches and skipped items per reviewer | `findings/*.md` |
+| Not reviewed (collapsed, always in full) | `findings/*.md` → 3. Not reviewed |
+| Findings rejected or merged in verification (collapsed, always in full) | `verified.md` |
+| Every check performed (collapsed, only when it fits) | `findings/*.md`, `verified.md` → Behaviour coverage |
+| Run metadata (collapsed) | `report-meta.md` |
 
-**PR:** #<n> <title> · **Head:** `<short sha>` · **CI:** <passing | failing: names | pending | none>
+## Length
 
-<Two or three sentences: what the PR does, the most important problem, and the main thing
-the root-cause analysis points at.>
+GitHub limits a comment to 65,536 characters. The script keeps the report under 60,000:
 
-| | Blocker | Major | Minor | Nit |
-|---|---|---|---|---|
-| Standards | | | | |
-| Code smells | | | | |
-| Spec alignment | | | | |
-| Test adequacy | | | | |
-
-### Findings
-
-<Blockers, then majors: the full block for each.>
-
-#### <ID> · <severity> · <title>
-`path/file.ext:120-134`
-```<lang>
-<quoted code>
-```
-**Measured against:** <source> — "<quote>"
-**Why it matters:** <...>
-**Suggested fix:** <...>
-
-<details>
-<summary>Minor findings and nits (<count>)</summary>
-
-| ID | Severity | Location | Problem | Suggested fix |
-|---|---|---|---|---|
-
-</details>
-
-### Spec alignment
-
-**Spec source:** <issue #m (link) | path/to/spec.md | none found>
-
-| Req | Requirement | Status | Evidence |
-|---|---|---|---|
-
-**Unrequested changes:** <table or "None.">
-
-### Why this happened
-
-These are inferences from the repository. The agent's prompt and transcript were not
-available.
-
-| Finding | Primary cause | Confidence | Evidence |
-|---|---|---|---|
-
-**Patterns:** <the grouped causes, one line each>
-
-### Proposed process improvements
-
-<For each proposal, ordered as in root-cause.md:>
-
-#### P1 · <type> · <title>
-**Prevents:** <finding IDs> · **Confidence:** <...> · **Target:** `path`
-```diff
-<the exact change>
-```
-**Expected effect:** <...> · **Cost:** <...>
-
-<If proposals exist:> _I can open a PR with the doc and skill changes above on request._
-
-### Evidence of review
-
-<details>
-<summary>What was reviewed (<n> files, <n> rules, <n> requirements, <n> checks)</summary>
-
-**Inputs:** <standards sources, spec sources, direction sources, process inventory, from the manifest>
-
-**Standards:** <Checks performed table>
-**Code smells:** <Checks performed and Searches run tables>
-**Spec alignment:** <Checks performed table>
-**Test adequacy:** <Behaviour coverage table>
-
-</details>
-
-<details>
-<summary>Not reviewed (<count>)</summary>
-
-<Every "Not reviewed" item from every reviewer, and every gap from the manifest.>
-
-</details>
-
-<details>
-<summary>Findings rejected in verification (<count>)</summary>
-
-| ID | Claim | Reason rejected | What was checked |
-|---|---|---|---|
-
-**Verification summary:** <the per-reviewer table>
-
-</details>
-
-<details>
-<summary>Run metadata</summary>
-
-- Reviewed commit: `<full head sha>` against `<base ref>` (`<base sha>`)
-- Reviewing agent and model: <tool, model>
-- Reviewers: standards, code-smells, spec-alignment, test-adequacy; verifier; root-cause analyst
-- Isolation: <parallel subagents with fresh context | none (sequential, shared context)>
-- Tests, linters and builds were not run by this review; CI status is reported as found.
-- Trimmed for length: <nothing | what>
-
-</details>
-````
+1. It builds the report with the full check tables.
+2. If that is too long, it leaves the check tables out and says so in the run metadata. The
+   per-reviewer counts, the "Not reviewed" list and the rejected findings always stay.
+3. If it is still too long, it fails and prints the size of each section. Shorten the
+   largest section in its source file (usually the proposals in `root-cause.md`) and run it
+   again. Never shorten blocker or major findings, the "Not reviewed" list, or the rejected
+   findings.

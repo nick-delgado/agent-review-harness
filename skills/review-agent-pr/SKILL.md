@@ -182,8 +182,17 @@ Skip this phase, and say so in the report, when there are no confirmed findings.
 
 ## Phase 7: Report
 
-1. Assemble `RUN_DIR/report.md` from `references/report-template.md`. Copy findings, tables
-   and ledgers from the phase outputs; do not rewrite their substance or soften severities.
+1. Write `RUN_DIR/report-head.md` (verdict, summary, counts) and `RUN_DIR/report-meta.md`
+   as described in `references/report-template.md`, then assemble the report:
+
+   ```sh
+   <SKILL_DIR>/scripts/assemble-report.sh "$RUN_DIR"
+   ```
+
+   The script copies findings, tables and ledgers from the phase outputs unchanged and keeps
+   the report within one comment. If it fails on a missing section or on length, fix the
+   source file it names (re-run that phase's subagent if a section is missing) and run it
+   again. Do not write or edit `report.md` by hand.
 2. Post it as one general PR comment:
 
    ```sh
@@ -191,8 +200,7 @@ Skip this phase, and say so in the report, when there are no confirmed findings.
    ```
 
    The script updates the comment from a previous run of this skill if one exists, and
-   otherwise creates it. It refuses a report that is over GitHub's comment size limit; the
-   template says what to trim.
+   otherwise creates it.
 3. Remove the worktree: `git worktree remove --force "$RUN_DIR/worktree"`. Keep the rest of
    `RUN_DIR`; it is the audit trail.
 4. Tell the user: the verdict, the counts by severity, the comment URL, and the path of

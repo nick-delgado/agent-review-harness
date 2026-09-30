@@ -49,8 +49,10 @@ One general comment on the PR, updated in place on a re-run:
 - a spec traceability table;
 - the inferred cause of each finding, with its confidence and evidence;
 - proposed changes to docs, prompts, skills, tests and CI checks, written as diffs;
-- collapsed evidence sections: every check performed (including the ones that passed), what
-  was not reviewed and why, and the findings the verifier rejected.
+- evidence of review: how many checks and searches each reviewer recorded, what was not
+  reviewed and why, and the findings the verifier rejected. The full table of every check
+  (including the ones that passed) is included when it fits in one comment, and is always
+  kept in the run directory.
 
 ## Install
 
@@ -95,6 +97,7 @@ skills/review-agent-pr/
   reviewers/                   one brief per specialist reviewer
   analysts/                    verifier and root-cause analyst briefs
   references/                  finding format, cause taxonomy, report template
+  scripts/assemble-report.sh   builds the report from the phase outputs, within one comment
   scripts/post-report.sh       creates or updates the PR comment
 install.sh
 ```

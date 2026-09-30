@@ -99,6 +99,12 @@ For each cause or pattern worth acting on, write a concrete proposal. Rules:
 - **Counterfactual:** <what would have had to be different, in one sentence>
 - **Could a test or check have caught it?** yes | partly | no — <which kind, and how>
 
+## Cause summary
+
+| Finding | Primary cause | Confidence | Evidence |
+|---|---|---|---|
+<one row per finding; the evidence cell is one sentence with its path:line>
+
 ## Patterns
 
 | Cause | Findings | What they have in common |
@@ -126,3 +132,20 @@ agent's prompt, its transcript) would settle it>
 
 Order proposals by how many confirmed findings, weighted by severity, each would have
 prevented.
+
+### Length and headings
+
+The report is one GitHub comment, assembled by a script that finds sections by heading. Use
+exactly the five `##` headings above, in that order. "Cause analysis" is the full record and
+stays in the run directory. The other four sections are copied into the report as written,
+so they must be short:
+
+- **Cause summary:** one line per finding.
+- **Patterns:** one line per pattern.
+- **Proposals:** the whole section under 9,000 characters. Per proposal, "Expected effect"
+  and "Cost and risk" are one sentence each, and the diff contains only the changed lines
+  with the minimum context to place them. Put alternatives, caveats and reasoning in "Cause
+  analysis", not here. Combine all `no-action` items into one proposal of two or three
+  lines. If the section is still too long, cut the lowest-ranked proposals and list their
+  titles in one closing line.
+- **Not explained:** one line per item.
