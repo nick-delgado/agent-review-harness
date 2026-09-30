@@ -183,7 +183,17 @@ of the agent that works on the code:
 
 Tell it your decisions in the same message, or point it to the comment that contains them.
 It pushes fixes to the PR branch and replies on the PR with one row per finding: fixed,
-disputed, not fixed, or waiting for a decision.
+disputed, not fixed, or waiting for a decision. It then recommends what comes next, from the
+verdict and the size of the change: nothing, a re-check, or a full review.
+
+**Re-check.** After fixes, a re-check is usually enough and costs about a fifth of a full
+review: the four reviewers do not run, and one verifier checks the changes since the
+reviewed commit and settles each earlier finding. In a fresh session:
+
+> Use the review-agent-pr skill to re-check PR 123.
+
+It falls back to a full review when there is no earlier review, the branch was rebased, or
+the change adds files or runs past about 300 lines.
 
 **Improve.** When several reviews are logged:
 
