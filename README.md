@@ -92,7 +92,8 @@ One general comment on the PR, updated in place on a re-run. It holds code findi
 
 Causes and proposals are kept out of the PR comment, so the agent fixing the code is not
 distracted by them and does not act on them. They go to one issue per repository, labelled
-`agent-process`, created on first use. Each reviewed PR gets one comment there:
+`agent-process`, created on first use. Each review round gets one comment there (a
+re-review after fixes adds another, so earlier causes stay in the log):
 
 - the inferred cause of each finding, with its confidence and evidence (blockers and majors
   in depth, minors in a line, nits not at all);

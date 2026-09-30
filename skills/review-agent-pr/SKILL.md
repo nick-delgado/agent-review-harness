@@ -173,8 +173,10 @@ to skim.
 the order above, writing each output file before starting the next. Record
 `isolation: none (sequential, shared context)` in the run metadata so the reader knows.
 
-When the reviewers finish, check that each output file exists and follows the schema. Re-run
-a reviewer whose output is missing or has findings without evidence.
+When the reviewers finish, check that each output file exists and follows the schema,
+including the extra table its brief requires (`### Spec traceability` and `### Unrequested
+changes` from spec alignment, `### Behaviour coverage` from test adequacy). Send a reviewer
+back to finish when its output is missing a section or has findings without evidence.
 
 ## Phase 5: Verification
 
@@ -228,7 +230,8 @@ the fixing agent from acting on process proposals, and lets causes be compared a
    ```
 
    The second script comments on the open issue labelled `agent-process`, creating the
-   label and the issue on first use, and updates this PR's earlier comment if there is one.
+   label and the issue on first use. There is one comment per review round: a re-run on the
+   same commit updates it, and a re-review of a new commit adds a new one.
    Keep the comment URL it prints.
 2. **The report.** Write `RUN_DIR/report-head.md` (verdict, summary, counts, the link from
    step 1) and `RUN_DIR/report-meta.md` as described in `references/report-template.md`,

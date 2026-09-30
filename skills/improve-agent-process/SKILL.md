@@ -36,8 +36,10 @@ Paths below are relative to the directory that contains this file (`SKILL_DIR`).
 It prints the tracking issue's number and every comment on it, then, for each reviewed PR,
 the response comment the authoring agent posted on that PR. Three kinds of text matter:
 
-- `<!-- agent-pr-review:process pr=N -->`: the process findings of one reviewed PR (causes,
-  patterns, proposals).
+- `<!-- agent-pr-review:process pr=N sha=S -->`: the process findings of one review round
+  of PR N at commit S (causes, patterns, proposals). A PR reviewed again after fixes has one
+  comment per round; the later rounds' findings often arose while the agent was fixing the
+  earlier ones.
 - `<!-- agent-pr-review:process-batch -->`: the record of an earlier run of this skill
   (what it changed, deferred and dropped).
 - The response on each reviewed PR (`<!-- agent-pr-review:response -->`): its Decision
@@ -52,8 +54,9 @@ If there are no new reviews, say so and stop.
 
 ### 2. Tally causes across reviews
 
-Build one table: cause (taxonomy ID) → the reviews it appears in → the findings, with their
-severity. Group by what is actually wrong in the project, not only by ID: "the skill's test
+Build one table: cause (taxonomy ID) → the reviewed PRs it appears in → the findings, with
+their severity. Count recurrence by PR, not by round: a cause seen in two rounds of the same
+PR is one PR's evidence, though a cause that survives a round of fixes is worth noting. Group by what is actually wrong in the project, not only by ID: "the skill's test
 recipe has no registration check" in PR 70 and in PR 72 is one item; two different
 `missing-instruction` gaps are two.
 

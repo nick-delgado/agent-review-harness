@@ -5,8 +5,8 @@
 #
 # Every citation of the form path/to/file.ext:N or path/to/file.ext:N-M in the given files
 # is resolved against <run-dir>/worktree (or <run-dir> itself, for spec files) and checked
-# to be within the file's length. A bare file name is resolved when it is unique in the
-# worktree. Citations of files that cannot be found are listed but not counted as invalid:
+# to be within the file's length. A bare file name or partial path is resolved when exactly
+# one tracked file in the worktree ends with it. Citations of files that cannot be found are listed but not counted as invalid:
 # they may name something outside the repository.
 #
 # Prints a summary and every invalid citation. Exits 1 when any citation is invalid.
@@ -51,8 +51,9 @@ while IFS="$(printf '\t')" read -r source citation; do
   elif [ -f "$run/$path" ]; then
     target="$run/$path"
   else
+    # A bare file name or a partial path: resolve it when exactly one tracked file ends with it.
     case "$path" in
-      */*) ;;
+      /*) ;;
       *)
         matches="$(cd "$tree" && git ls-files | grep -E "(^|/)$(printf '%s' "$path" | sed 's/[.]/\\./g')\$" || true)"
         if [ -n "$matches" ] && [ "$(printf '%s\n' "$matches" | wc -l | tr -d ' ')" -eq 1 ]; then

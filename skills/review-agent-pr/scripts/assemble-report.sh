@@ -265,7 +265,7 @@ build_report() {
 build_process() {
   local pr="$1" sha="$2"
 
-  echo "<!-- agent-pr-review:process pr=$pr -->"
+  echo "<!-- agent-pr-review:process pr=$pr sha=$sha -->"
   echo "## Review of PR #$pr at \`$sha\`"
   echo
   echo "Why the agent produced the findings of that review, and what could change in the project's docs, skills, prompts, specs and guardrails. Causes are inferences from the repository: the agent's prompt and transcript were not available."
@@ -323,6 +323,7 @@ case "$mode" in
   process)
     [ "$#" -eq 4 ] || usage
     case "$3" in '' | *[!0-9]*) echo "error: PR number must be numeric, got '$3'" >&2; exit 2 ;; esac
+    case "$4" in '' | *[!0-9a-f]*) echo "error: head sha must be hexadecimal, got '$4'" >&2; exit 2 ;; esac
     [ -s "$rootcause" ] || { echo "error: missing or empty $rootcause" >&2; exit 1; }
     need "$rootcause" "Cause summary" "Patterns" "Proposals" "Not explained"
     fail_if_missing

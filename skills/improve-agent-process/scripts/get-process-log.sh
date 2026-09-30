@@ -33,7 +33,7 @@ printf '%s\n' "$log"
 
 # The owner's decisions on each reviewed PR are recorded in the response comment the
 # address-pr-review skill posts on that PR.
-prs="$(printf '%s\n' "$log" | sed -n 's/^<!-- agent-pr-review:process pr=\([0-9][0-9]*\) -->$/\1/p' | sort -un)"
+prs="$(printf '%s\n' "$log" | sed -n 's/^<!-- agent-pr-review:process pr=\([0-9][0-9]*\)\( sha=[0-9a-f]*\)\{0,1\} -->$/\1/p' | sort -un)"
 
 for pr in $prs; do
   state="$(gh pr view "$pr" --json state --jq '.state' 2>/dev/null || echo "unknown")"
