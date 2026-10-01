@@ -68,8 +68,9 @@ result.
 
 ## The PR comment
 
-One general comment on the PR per review run. Earlier reports are never edited, so the PR's
-conversation is the audit trail: each report names the commit it reviewed (linked), and each
+One general comment on the PR per review run, or several consecutive comments marked
+"part k of n" when the report is longer than GitHub's comment limit (nothing is trimmed).
+Earlier reports are never edited, so the PR's conversation is the audit trail: each report names the commit it reviewed (linked), and each
 response from the fixing agent names the review it answers, the commit it started from and
 the commit it produced. It holds code findings only:
 
@@ -237,7 +238,9 @@ skills/
     analysts/                        verifier and root-cause analyst briefs
     references/                      finding format, cause taxonomy, output layout
     scripts/assemble-report.sh       builds the PR comment and the tracking-issue comment
-    scripts/post-report.sh           posts the report as a new PR comment
+    scripts/post-report.sh           posts the report as new PR comments, one per part
+    scripts/split-report.awk         splits a long report into comment-sized parts
+    scripts/get-reports.sh           fetches every report on a PR, joining multi-part ones
     scripts/post-process-findings.sh creates or updates the tracking-issue comment
     scripts/get-pr.sh                saves the PR, its files, commits, diff and CI state
     scripts/get-issue.sh             saves an issue and its comments as the spec
@@ -248,6 +251,7 @@ skills/
   address-pr-review/
     SKILL.md
     scripts/get-review.sh            prints the latest review report and whether the PR moved since
+    scripts/get-reports.sh           (same as above)
     scripts/get-decisions.sh         lists the owner's Decision lines for a review
     scripts/post-response.sh         posts the response as a new PR comment
   improve-agent-process/

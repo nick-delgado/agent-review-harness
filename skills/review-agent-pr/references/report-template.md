@@ -69,7 +69,7 @@ could not complete. The verdict is a recommendation to the human who merges.
 
 ## What the script assembles
 
-### The report (`assemble-report.sh <RUN_DIR> report <full head sha>`)
+### The report (`assemble-report.sh <RUN_DIR> report <full head sha>`, written to `report-01.md`, `report-02.md`, ...)
 
 | Section | Taken from |
 |---|---|
@@ -99,11 +99,19 @@ work by them.
 
 ## Length
 
-GitHub limits a comment to 65,536 characters. The script keeps each output under 60,000:
+GitHub limits a comment to 65,536 characters. Nothing in the report is trimmed to fit:
 
-1. It builds the report with the full check tables.
-2. If that is too long, it leaves the check tables out and says so in the run metadata. The
-   per-reviewer counts, the "Not reviewed" list and the rejected findings always stay.
-3. If an output is still too long, it fails and prints the size of each section. Shorten
-   the largest section in its source file and run it again. Never shorten blocker or major
-   findings, the "Not reviewed" list, or the rejected findings.
+- **The report** is split into as many comments as it needs, each under 60,000 characters.
+  It splits only between units: a section, a finding, a collapsed `<details>` block, or the
+  minor-findings table. A part that starts inside a section repeats the section heading
+  with "(continued)". A unit too large for one comment on its own (a very long table) is
+  split between lines, repeating the table's header and reopening its `<details>` block.
+- **Each part's first line** is `<!-- agent-pr-review:report sha=<reviewed commit>
+  run=<run id> part=<k>/<n> -->`. Part 1 says the review is in n parts; every later part
+  starts with "Agent PR review of `<sha>`: part k of n"; every part but the last ends with
+  "Continued in part k+1 of n". The scripts that read reports (`get-reports.sh`, used by
+  `get-review.sh` and `get-previous.sh`) join the parts of a run in order, and skip a
+  report with a part missing, with a warning.
+- **The process findings** must fit in one comment. If they do not, the script fails and
+  prints the size of each section: shorten the proposals in `root-cause.md` (see the
+  analyst's length rules) and run it again.

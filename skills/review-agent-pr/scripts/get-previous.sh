@@ -4,7 +4,7 @@
 # Usage: get-previous.sh <pr-number> <run-dir>
 #
 # Writes into <run-dir>/previous/:
-#   report.md                 the latest review report on the PR
+#   report.md                 the latest review report on the PR (parts joined)
 #   earlier/report-<sha>.md   the last report of each earlier reviewed commit
 #   responses.md              every response from the authoring agent (address-pr-review),
 #                             oldest first, each under a header with its comment ID and time
@@ -16,7 +16,6 @@
 
 set -euo pipefail
 
-REPORT_MARKER='<!-- agent-pr-review:report'
 RESPONSE_MARKER='<!-- agent-pr-review:response'
 
 if [ "$#" -ne 2 ] || [ ! -d "$2" ]; then
@@ -45,21 +44,21 @@ reviewed_sha() {
   printf '%s' "$sha"
 }
 
-ids="$(
-  gh api --paginate "repos/{owner}/{repo}/issues/${pr}/comments" \
-    --jq ".[] | select(.body | startswith(\"${REPORT_MARKER}\")) | .id"
-)"
+here="$(cd "$(dirname "$0")" && pwd)"
+reports_dir="$(mktemp -d)"
+trap 'rm -rf "$reports_dir"' EXIT
 
-if [ -z "$ids" ]; then
+# Every report, oldest first, with the parts of multi-comment reports joined.
+reports="$("$here/get-reports.sh" "$pr" "$reports_dir")"
+
+if [ -z "$reports" ]; then
   echo "no previous review"
   exit 0
 fi
 
 mkdir -p "$out"
-latest="$(printf '%s\n' "$ids" | tail -n 1)"
-latest_body="$(gh api "repos/{owner}/{repo}/issues/comments/${latest}" --jq '.body')"
-printf '%s\n' "$latest_body" > "$out/report.md"
-latest_sha="$(reviewed_sha "$latest_body")"
+IFS="$(printf '\t')" read -r latest_file latest_sha _ _ _ <<< "$(printf '%s\n' "$reports" | tail -n 1)"
+cp "$latest_file" "$out/report.md"
 echo "previous-commit: ${latest_sha:-unknown}"
 echo "previous report: $out/report.md"
 
@@ -81,7 +80,11 @@ save_earlier() {
 # GraphQL; where GraphQL is blocked (some cloud environments), those rounds are skipped and
 # said so. Everything else here uses REST.
 edits_query='query($id: ID!) { node(id: $id) { ... on IssueComment { userContentEdits(first: 50) { nodes { diff } } } } }'
-for id in $ids; do
+legacy_ids="$(
+  gh api --paginate "repos/{owner}/{repo}/issues/${pr}/comments" \
+    --jq '.[] | select(.body | split("\n")[0] == "<!-- agent-pr-review:report -->") | .id'
+)"
+for id in $legacy_ids; do
   first_line="$(gh api "repos/{owner}/{repo}/issues/comments/${id}" --jq '.body | split("\n")[0]')"
   [ "$first_line" = "<!-- agent-pr-review:report -->" ] || continue
   node="$(gh api "repos/{owner}/{repo}/issues/comments/${id}" --jq '.node_id')"
@@ -97,11 +100,11 @@ for id in $ids; do
   done
 done
 
-# Earlier report comments.
-for id in $(printf '%s\n' "$ids" | sed '$d'); do
-  body="$(gh api "repos/{owner}/{repo}/issues/comments/${id}" --jq '.body')"
-  save_earlier "$(reviewed_sha "$body")" "$body"
-done
+# Earlier reports.
+while IFS="$(printf '\t')" read -r file sha _ _ _; do
+  [ -n "$file" ] || continue
+  save_earlier "$sha" "$(cat "$file")"
+done <<< "$(printf '%s\n' "$reports" | sed '$d')"
 
 if [ -d "$out/earlier" ]; then
   for f in "$out"/earlier/report-*.md; do

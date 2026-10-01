@@ -299,12 +299,15 @@ the fixing agent from acting on process proposals, and lets causes be compared a
 
    ```sh
    <SKILL_DIR>/scripts/assemble-report.sh "$RUN_DIR" report <full head sha>
-   <SKILL_DIR>/scripts/post-report.sh <n> "$RUN_DIR/report.md"
+   <SKILL_DIR>/scripts/post-report.sh <n> "$RUN_DIR"/report-[0-9][0-9].md
    ```
 
-   Every run posts a new comment; earlier reports are never edited, so the PR's
-   conversation is the audit trail. The report's first line and header name the reviewed
-   commit.
+   Every run posts new comments; earlier reports are never edited, so the PR's
+   conversation is the audit trail. A report that fits in one comment is one comment. A
+   longer one is split, between sections or findings and never inside one, into
+   consecutive comments marked "part k of n", each within GitHub's limit; nothing is
+   trimmed. Post all the parts, in order, with the one command above. `report.md` holds the
+   whole report in one file for the run's records.
 3. Remove the worktree: `git worktree remove --force "$RUN_DIR/worktree"`. Keep the rest of
    `RUN_DIR`; it is the audit trail.
 4. Tell the user: the verdict, the counts by severity and by action (fix now, needs the

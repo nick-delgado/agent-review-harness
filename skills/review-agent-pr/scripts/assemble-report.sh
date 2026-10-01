@@ -4,14 +4,17 @@
 # Usage:
 #   assemble-report.sh <run-dir> report <head-sha>
 #       Reads  report-head.md, report-meta.md, verified.md, findings/*.md
-#       Writes report.md: the PR comment (code findings and evidence).
+#       Writes report-01.md, report-02.md, ...: the PR comments to post, in order. A report
+#       that fits in one comment is one part; a longer one is split between sections or
+#       findings into consecutive comments, each marked "part k/n". Also writes report.md,
+#       the whole report in one file, for the run's records (not posted).
 #
 #   assemble-report.sh <run-dir> process <pr-number> <head-sha>
 #       Reads  root-cause.md
 #       Writes process.md: the tracking-issue comment (causes and proposals).
 #
-# In report mode the full check tables are included only when the comment stays within the
-# soft limit. Exits 1, with the size of each section, when an output cannot be made to fit.
+# The process output must fit in one comment; the script exits 1, with the size of each
+# section, when it does not.
 
 set -euo pipefail
 
@@ -219,9 +222,8 @@ label() {
 }
 
 build_report() {
-  local with_tables="$1" r f
+  local r f
 
-  echo "<!-- agent-pr-review:report sha=$report_sha -->"
   trim < "$run/report-head.md"
 
   printf '\n### Fix now\n\n'
@@ -291,28 +293,21 @@ build_report() {
   printf '%s\n' "$spot" | or_default "None."
   printf '\n</details>\n'
 
-  if [ "$with_tables" = "yes" ]; then
-    printf '\n<details>\n<summary>Every check performed</summary>\n\n'
-    for r in $reviewers; do
-      while IFS= read -r f; do
-        [ -n "$f" ] || continue
-        printf '**%s%s**\n\n' "$(label "$r")" "$(part_label "$f")"
-        h3 "$f" "Checks performed" | trim
-        echo
-      done < <(outputs "$r")
-    done
-    printf '**Behaviour coverage**\n\n'
-    h3 "$verified" "Behaviour coverage" | trim | or_default "Not produced."
-    printf '\n</details>\n'
-  fi
+  printf '\n<details>\n<summary>Every check performed</summary>\n\n'
+  for r in $reviewers; do
+    while IFS= read -r f; do
+      [ -n "$f" ] || continue
+      printf '**%s%s**\n\n' "$(label "$r")" "$(part_label "$f")"
+      h3 "$f" "Checks performed" | trim
+      echo
+    done < <(outputs "$r")
+  done
+  printf '**Behaviour coverage**\n\n'
+  h3 "$verified" "Behaviour coverage" | trim | or_default "Not produced."
+  printf '\n</details>\n'
 
   printf '\n<details>\n<summary>Run metadata</summary>\n\n'
   trim < "$run/report-meta.md"
-  if [ "$with_tables" = "yes" ]; then
-    echo "- Full check tables: included above."
-  else
-    echo "- Full check tables: left out to fit one comment; they are in the run directory (\`findings/*.md\`, \`verified.md\`)."
-  fi
   printf '\n</details>\n'
 }
 
@@ -364,16 +359,49 @@ case "$mode" in
         ;;
     esac
 
-    out="$run/report.md"
-    build_report yes > "$out"
-    tables="included"
-    if [ "$(size "$out")" -gt "$SOFT_LIMIT" ]; then
-      build_report no > "$out"
-      tables="left out"
-    fi
-    chars="$(size "$out")"
-    [ "$chars" -le "$SOFT_LIMIT" ] || too_long "$out" "$chars"
-    echo "wrote $out ($chars characters; check tables $tables)"
+    whole="$run/report.md"
+    build_report > "$whole"
+    rm -f "$run"/report-[0-9][0-9].md
+
+    # Split into parts that each fit in one comment, leaving room for the part's marker,
+    # heading and footer.
+    here="$(cd "$(dirname "$0")" && pwd)"
+    run_id="$(date -u +%Y%m%dT%H%M%SZ)"
+    parts_dir="$(mktemp -d)"
+    trap 'rm -rf "$parts_dir"' EXIT
+    awk -v limit=$((SOFT_LIMIT - 600)) -f "$here/split-report.awk" "$whole" |
+      awk -v dir="$parts_dir" 'BEGIN { n = 1; f = sprintf("%s/%02d", dir, n) } /^@@PART-BREAK@@$/ { close(f); n++; f = sprintf("%s/%02d", dir, n); next } { print > f }'
+    n="$(ls "$parts_dir" | wc -l | tr -d ' ')"
+    short="${report_sha:0:7}"
+
+    for k in $(seq 1 "$n"); do
+      kk="$(printf '%02d' "$k")"
+      part="$run/report-$kk.md"
+      {
+        echo "<!-- agent-pr-review:report sha=$report_sha run=$run_id part=$k/$n -->"
+        if [ "$k" -gt 1 ]; then
+          echo "## Agent PR review of \`$short\`: part $k of $n"
+          echo
+          echo "_Continued from part $((k - 1)). The parts are consecutive comments; read them in order._"
+          echo
+        fi
+        if [ "$k" -eq 1 ] && [ "$n" -gt 1 ]; then
+          # After the report's first heading line.
+          awk -v n="$n" 'NR == 1 { print; print ""; printf "_This review is in %d parts, posted as consecutive comments. This is part 1._\n", n; next } { print }' "$parts_dir/$kk"
+        else
+          cat "$parts_dir/$kk"
+        fi
+        if [ "$k" -lt "$n" ]; then
+          echo
+          echo "---"
+          echo "_Continued in part $((k + 1)) of $n._"
+        fi
+      } > "$part"
+      chars="$(size "$part")"
+      [ "$chars" -le 65536 ] || too_long "$part" "$chars"
+      echo "wrote $part ($chars characters, part $k of $n)"
+    done
+    echo "whole report: $whole ($(size "$whole") characters)"
     ;;
 
   process)

@@ -43,9 +43,11 @@ Paths below are relative to the directory that contains this file (`SKILL_DIR`).
 <SKILL_DIR>/scripts/get-review.sh <pr-number>
 ```
 
-It prints the latest review report on the PR: its author and URL, the commit it reviewed
-(`reviewed-commit`), the PR's current head (`pr-head`), whether they match, and the report
-itself. If the PR number was not given, use the open PR whose head is the current commit
+It prints the latest review report on the PR: its author and URL, how many comments it was
+posted in (`report-parts`), the commit it reviewed (`reviewed-commit`), the PR's current
+head (`pr-head`), whether they match, and the report itself. A long report is posted as
+consecutive comments marked "part k of n"; the script joins them, so read its output, not
+the PR's comments one by one. If the PR number was not given, use the open PR whose head is the current commit
 (`gh api "repos/{owner}/{repo}/commits/$(git rev-parse HEAD)/pulls" --jq '.[0].number'`).
 
 - No report: stop and tell the user.
