@@ -203,6 +203,11 @@ every round. Only lines in this form, from someone with write access, count as d
 > Use the address-pr-review skill on PR 123.
 
 It picks up your `Decision` lines from the PR; you can also give decisions in the session.
+If a fix turns out to need something the review did not foresee (a file outside the task's
+scope, say), it collects those and asks you once, at the end, whether to make the change,
+open a follow-up issue, or leave it. In an unattended run it leaves them undone and lists
+them first in its response. It corrects facts in any file, instruction files included, but
+never changes the rules agents follow: those go through `improve-agent-process`.
 It pushes fixes to the PR branch and replies on the PR with one row per finding: fixed,
 disputed, not fixed, or waiting for a decision. It then recommends what comes next, from the
 verdict and the size of the change: nothing, a re-check, or a full review.

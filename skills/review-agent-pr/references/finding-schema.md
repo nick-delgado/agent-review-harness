@@ -70,8 +70,12 @@ that acts on a question only the owner can answer is guessing a second time.
 | Action | When | What happens next |
 |---|---|---|
 | `fix now` | The right outcome is settled by the spec, a documented rule or the code itself, and the fix lies within what the task allowed the PR to change. | The authoring agent fixes it. |
-| `needs owner decision` | The fix depends on a choice the spec does not settle: two sources conflict, the spec left a behaviour open, or the finding questions a decision the agent made. Fill in "Decision needed". | The owner answers on the PR; only then does the agent act. |
-| `for the owner` | The gap is real and the PR exposes it, but the fix lies in a contract, shared file or pre-existing code that the task did not allow the PR to change (for example, outside the issue's owned paths). Say in "Why it matters" why the PR could not fix it. Severity is capped at minor. | Nothing in this PR. It does not count toward the verdict. |
+| `needs owner decision` | The fix depends on a choice the spec does not settle: two sources conflict, the spec left a behaviour open, or the finding questions a decision the agent made. Also a small, self-contained edit outside the task's scope that this PR is the natural place for (a doc line it made stale): the owner may allow it. Fill in the decision fields. | The owner answers on the PR; only then does the agent act. |
+| `for the owner` | The gap is real and the PR exposes it, but the fix lies in a contract, shared file or pre-existing code that the task did not allow the PR to change (for example, outside the issue's owned paths), and is more than a small edit this PR could carry. Say in "Why it matters" why the PR could not fix it. Severity is capped at minor. | Nothing in this PR. It does not count toward the verdict. |
+
+The authoring agent may correct facts in any file, but never changes rules (what agents or
+contributors should do) in instruction files, skills, agent definitions, templates or CI
+configuration. A finding whose fix would change such a rule is never `fix now`.
 
 If part of a finding can be fixed now and part needs a decision, split it into two
 findings.

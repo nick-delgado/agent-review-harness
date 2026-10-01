@@ -89,6 +89,11 @@ Decisions matter here in two ways:
   agent will read it. A decision that only fixes one PR's behaviour, and is already
   expressed in the code or contract the next agent will read, needs no doc change.
 
+Also list the **leftovers**: findings marked `not fixed: needs owner` in the latest
+response to a review of a PR that has since merged, with no follow-up issue linked. They
+are not process changes and this skill does not act on them, but nothing else tracks them
+once the PR is merged. Show them to the user in step 7.
+
 ### 5. Select
 
 | A proposal is... | Decision |
@@ -136,6 +141,7 @@ Then show the user:
   rests on, and the exact edit;
 - what is deferred (and what would promote it) and what is dropped, one line each;
 - decisions waiting for the owner;
+- the leftovers from step 4, for the user to fix or file;
 - the effect on open PRs, and your recommendation on timing: guardrails and corrections of
   wrong instructions now, the rest once the current queue of PRs has been reviewed.
 

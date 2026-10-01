@@ -37,8 +37,15 @@ For each finding, in every findings file:
      lies inside the scope, the answer is **yes**.
    - If the fix requires changing something outside it (a contract, a shared file,
      pre-existing code the task did not allow the PR to touch), the answer is **no**. Do
-     not reject the finding: keep it, set its action to `for the owner` (step 8) and cap
-     the severity at minor.
+     not reject the finding. Then decide who should settle it (step 8):
+     - The edit outside the scope is small and self-contained, and this PR is the natural
+       place for it (a doc line this PR made stale, a one-line shared-file change the PR's
+       work implies): the owner may simply allow it, so its action is `needs owner
+       decision`, with options "(a) let this PR make the edit, disclosed as a shared-file
+       change" and "(b) leave it for a follow-up issue", and a recommendation. The
+       severity stays as graded.
+     - Otherwise (a contract redesign, other work's code, anything larger): its action is
+       `for the owner`, and the severity is capped at minor.
    - A finding with one fix inside the scope and another outside it is a **yes**: the PR
      could have done the in-scope one.
 5. **Is it already machine-enforced?** If the manifest lists a linter, type checker or CI
@@ -60,7 +67,13 @@ For each finding, in every findings file:
    reviewer's level, not to change it.
 8. **Who acts on it?** Settle the "Action" field, using the table in the finding schema.
    The authoring agent will fix everything marked `fix now` without asking, so be strict:
-   - `for the owner` when step 4 answered no.
+   - `for the owner` or `needs owner decision` when step 4 answered no, as it says.
+   - Never `fix now` for a change to rules: what agents or contributors should do, in
+     instruction files (`AGENTS.md`, `CLAUDE.md`, `GEMINI.md`), skills, agent definitions,
+     templates or CI configuration. The authoring agent is not allowed to make those; they
+     are process work for the cause analysis, or `for the owner`. A correction of a fact in
+     such a file that this PR made untrue (a command, a path, a "coming later" note) is not
+     a rule change and is treated like any other edit.
    - `needs owner decision` when the right outcome is not settled by the spec, a documented
      rule or the code: two sources conflict, the spec is silent on the behaviour, or the
      suggested fix begins with "decide", "confirm" or "ask". If the finding also has a part
