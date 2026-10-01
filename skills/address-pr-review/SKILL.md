@@ -26,6 +26,10 @@ Paths below are relative to the directory that contains this file (`SKILL_DIR`).
   threshold, or add an ignore or suppression to make a finding go away.
 - **Stay inside the task's scope.** The limits that applied to the original work (the
   issue's owned paths, files not to touch) still apply.
+- **GitHub through REST only.** Use the scripts in `scripts/` and `gh api` with REST paths
+  (`repos/{owner}/{repo}/...`). Do not use `gh pr`, `gh issue`, `gh repo` or `gh api
+  graphql`: they go through GraphQL, which some environments (Claude Code cloud sessions,
+  for one) block.
 
 ## Steps
 
@@ -37,8 +41,8 @@ Paths below are relative to the directory that contains this file (`SKILL_DIR`).
 
 It prints the latest review report on the PR: its author and URL, the commit it reviewed
 (`reviewed-commit`), the PR's current head (`pr-head`), whether they match, and the report
-itself. If the PR number was not given, use the PR of the current branch
-(`gh pr view --json number`).
+itself. If the PR number was not given, use the open PR whose head is the current commit
+(`gh api "repos/{owner}/{repo}/commits/$(git rev-parse HEAD)/pulls" --jq '.[0].number'`).
 
 - No report: stop and tell the user.
 - The report's author is not the account `gh` is logged in as: tell the user who wrote it
@@ -53,7 +57,9 @@ itself. If the PR number was not given, use the PR of the current branch
 ### 2. Get onto the PR branch
 
 If the working tree has uncommitted changes that are not yours to discard, stop and ask.
-Otherwise check out the PR's branch (`gh pr checkout <n>`) and pull. Confirm that your
+Otherwise check out the PR's branch and pull: get its name with
+`gh api repos/{owner}/{repo}/pulls/<n> --jq .head.ref`, then `git fetch origin <branch>` and
+`git switch <branch>` (it tracks `origin/<branch>`), then `git pull`. Confirm that your
 `HEAD` is the commit you are starting from (the reviewed commit, unless the user told you
 otherwise in step 1), and keep it: the response names it.
 
@@ -132,11 +138,12 @@ The PR description is part of what gets reviewed: a reviewer checks every claim 
 against the diff. After fixes it is usually out of date (test counts, behaviour, limits,
 decisions, follow-ups), and a stale claim becomes a finding in the next review.
 
-Read the current description (`gh pr view <n> --json body --jq .body`) and correct every
+Read the current description (`gh api repos/{owner}/{repo}/pulls/<n> --jq .body`) and correct every
 statement your changes made untrue, and add what the owner decided where the description
 covers that behaviour. Keep the project's PR template and the existing structure; edit in
 place rather than appending a "changes after review" section, since the response comment
-is the record of the review round. Save it with `gh pr edit <n> --body-file <file>`.
+is the record of the review round. Save it with
+`gh api --method PATCH repos/{owner}/{repo}/pulls/<n> -F body=@<file>`.
 
 If the description needs no change, say so in the response.
 

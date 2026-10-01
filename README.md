@@ -171,6 +171,13 @@ from `skills/` into any of the locations above by hand works too.
 Requirements for all three: `gh` installed and authenticated, and a working directory that
 is a clone of the repository.
 
+All GitHub access goes through the REST API (`gh api`), never GraphQL, so the skills also
+run where GraphQL is blocked, such as Claude Code cloud sessions. The one exception is
+optional: recovering review rounds from comments that older versions of the harness edited
+in place, which is skipped with a note when GraphQL is unavailable. If `gh` cannot work out
+the repository from the git remote (for example, behind a proxy remote), set
+`GH_REPO=<owner>/<repo>`.
+
 **Review.** Start a new session, not the one that wrote the PR, and ideally a different
 tool or model:
 
@@ -227,6 +234,8 @@ skills/
     scripts/assemble-report.sh       builds the PR comment and the tracking-issue comment
     scripts/post-report.sh           posts the report as a new PR comment
     scripts/post-process-findings.sh creates or updates the tracking-issue comment
+    scripts/get-pr.sh                saves the PR, its files, commits, diff and CI state
+    scripts/get-issue.sh             saves an issue and its comments as the spec
     scripts/get-previous.sh          saves earlier reports, responses and decisions for a re-review
     scripts/get-decisions.sh         lists the owner's Decision lines for a review (same as above)
     scripts/check-citations.sh       checks every file:line citation against the code

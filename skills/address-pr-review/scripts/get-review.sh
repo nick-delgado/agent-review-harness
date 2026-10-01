@@ -43,7 +43,7 @@ reviewed="$(printf '%s\n' "$body" | head -n 1 | sed -n 's/^<!-- agent-pr-review:
 if [ -z "$reviewed" ]; then
   reviewed="$(printf '%s\n' "$body" | sed -nE 's/.*\*\*(Head|Reviewed commit):\*\* \[?`([0-9a-f]+)`.*/\2/p' | head -n 1)"
 fi
-head_sha="$(gh pr view "$pr" --json headRefOid --jq '.headRefOid')"
+head_sha="$(gh api "repos/{owner}/{repo}/pulls/${pr}" --jq '.head.sha')"
 
 echo "report-author: $(gh api "repos/{owner}/{repo}/issues/comments/${id}" --jq '.user.login')"
 echo "gh-account: $(gh api user --jq '.login')"

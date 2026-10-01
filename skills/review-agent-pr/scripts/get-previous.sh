@@ -77,17 +77,22 @@ save_earlier() {
 # Oldest first throughout, so the last report of each commit is the one kept.
 
 # Reports from before every run got its own comment were edited in place; their earlier
-# rounds survive only in the comment's edit history.
+# rounds survive only in the comment's edit history. That history is only available through
+# GraphQL; where GraphQL is blocked (some cloud environments), those rounds are skipped and
+# said so. Everything else here uses REST.
 edits_query='query($id: ID!) { node(id: $id) { ... on IssueComment { userContentEdits(first: 50) { nodes { diff } } } } }'
 for id in $ids; do
   first_line="$(gh api "repos/{owner}/{repo}/issues/comments/${id}" --jq '.body | split("\n")[0]')"
   [ "$first_line" = "<!-- agent-pr-review:report -->" ] || continue
   node="$(gh api "repos/{owner}/{repo}/issues/comments/${id}" --jq '.node_id')"
-  count="$(gh api graphql -f query="$edits_query" -f id="$node" --jq '.data.node.userContentEdits.nodes | length' 2>/dev/null || echo 0)"
+  if ! count="$(gh api graphql -f query="$edits_query" -f id="$node" --jq '.data.node.userContentEdits.nodes | length' 2>/dev/null)"; then
+    echo "note: comment ${id} was edited in place by an older version of this skill, and its earlier rounds could not be read (GraphQL unavailable)"
+    continue
+  fi
   i="$count"
   while [ "$i" -gt 0 ]; do
     i=$((i - 1))
-    body="$(gh api graphql -f query="$edits_query" -f id="$node" --jq ".data.node.userContentEdits.nodes[$i].diff // \"\"")"
+    body="$(gh api graphql -f query="$edits_query" -f id="$node" --jq ".data.node.userContentEdits.nodes[$i].diff // \"\"" 2>/dev/null || true)"
     save_earlier "$(reviewed_sha "$body")" "$body"
   done
 done
