@@ -83,7 +83,9 @@ For each finding, in every findings file:
 
 Then, across all files:
 
-9. **Deduplicate.** Merge two findings only when they point at the same code and the same
+9. **Deduplicate.** When a reviewer ran in parts, two parts may report one problem from
+   either side (the duplicate in part 1 and the original in part 2); treat them like any
+   other pair. Merge two findings only when they point at the same code and the same
    fix would resolve both: keep one, keep the clearest evidence, and list the other ID as
    merged into it. The same problem at several locations is one finding with several
    locations. Two findings that share a cause but need different fixes (the code and the
@@ -239,7 +241,9 @@ so use exactly these `##` and `###` headings, in this order, and no other `##` h
   the full blocks above remain the record.
 - Under "Reviewer tables", copy each reviewer's table of that name, corrected where a
   rejection or adjustment changes a row. Write `Not produced.` under a heading whose
-  reviewer supplied no table.
+  reviewer supplied no table. When a reviewer ran in parts (`findings/<name>--<k>.md`),
+  combine the parts' tables into one, and in the verification summary give the reviewer one
+  row with the parts' totals.
 - Every `path:line` you write, including in copied tables, must be a line of the file in
   `<RUN_DIR>/worktree`, never a position in `diff.patch`. A script checks every citation in
   this file after you finish, and invalid ones are sent back to you.

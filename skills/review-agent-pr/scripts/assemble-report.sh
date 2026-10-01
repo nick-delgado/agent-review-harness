@@ -171,6 +171,44 @@ group() {
 
 reviewers="standards code-smells spec-alignment test-adequacy"
 
+# A reviewer's output files: findings/<name>.md, or findings/<name>--<part>.md when a large
+# PR was split into parts.
+outputs() {
+  local f
+  for f in "$run/findings/$1.md" "$run/findings/$1--"*.md; do
+    [ -s "$f" ] && printf '%s\n' "$f"
+  done
+  return 0
+}
+
+# Sum of a counter over all of a reviewer's output files.
+total() {
+  local r="$1" kind="$2" f n=0
+  while IFS= read -r f; do
+    [ -n "$f" ] || continue
+    case "$kind" in
+      checks) n=$((n + $(h3 "$f" "Checks performed" | rows) + $(h3 "$f" "Behaviour coverage" | rows) + $(h3 "$f" "Spec traceability" | rows))) ;;
+      searches) n=$((n + $(h3 "$f" "Searches run" | rows))) ;;
+      skipped) n=$((n + $(h2 "$f" "3. Not reviewed" | items))) ;;
+    esac
+  done < <(outputs "$r")
+  echo "$n"
+}
+
+parts_note() {
+  local count
+  count="$(outputs "$1" | grep -c . || true)"
+  [ "$count" -gt 1 ] && printf ' (%s parts)' "$count"
+  return 0
+}
+
+# ", part 2" for findings/<name>--2.md, nothing for an unsplit output.
+part_label() {
+  case "$(basename "$1" .md)" in
+    *--*) printf ', part %s' "${1##*--}" | sed 's/\.md$//' ;;
+  esac
+}
+
 label() {
   case "$1" in
     standards) echo "Standards" ;;
@@ -222,10 +260,8 @@ build_report() {
   echo "| Reviewer | Checks recorded | Searches run | Items not reviewed |"
   echo "|---|---|---|---|"
   for r in $reviewers; do
-    f="$run/findings/$r.md"
-    if [ -s "$f" ]; then
-      checks=$(($(h3 "$f" "Checks performed" | rows) + $(h3 "$f" "Behaviour coverage" | rows) + $(h3 "$f" "Spec traceability" | rows)))
-      echo "| $(label "$r") | $checks | $(h3 "$f" "Searches run" | rows) | $(h2 "$f" "3. Not reviewed" | items) |"
+    if [ -n "$(outputs "$r")" ]; then
+      echo "| $(label "$r")$(parts_note "$r") | $(total "$r" checks) | $(total "$r" searches) | $(total "$r" skipped) |"
     else
       echo "| $(label "$r") | did not run | | |"
     fi
@@ -233,11 +269,12 @@ build_report() {
 
   printf '\n<details>\n<summary>Not reviewed</summary>\n\n'
   for r in $reviewers; do
-    f="$run/findings/$r.md"
-    [ -s "$f" ] || continue
-    printf '**%s**\n\n' "$(label "$r")"
-    h2 "$f" "3. Not reviewed" | trim | or_default "Nothing skipped."
-    echo
+    while IFS= read -r f; do
+      [ -n "$f" ] || continue
+      printf '**%s%s**\n\n' "$(label "$r")" "$(part_label "$f")"
+      h2 "$f" "3. Not reviewed" | trim | or_default "Nothing skipped."
+      echo
+    done < <(outputs "$r")
   done
   printf '</details>\n'
 
@@ -257,11 +294,12 @@ build_report() {
   if [ "$with_tables" = "yes" ]; then
     printf '\n<details>\n<summary>Every check performed</summary>\n\n'
     for r in $reviewers; do
-      f="$run/findings/$r.md"
-      [ -s "$f" ] || continue
-      printf '**%s**\n\n' "$(label "$r")"
-      h3 "$f" "Checks performed" | trim
-      echo
+      while IFS= read -r f; do
+        [ -n "$f" ] || continue
+        printf '**%s%s**\n\n' "$(label "$r")" "$(part_label "$f")"
+        h3 "$f" "Checks performed" | trim
+        echo
+      done < <(outputs "$r")
     done
     printf '**Behaviour coverage**\n\n'
     h3 "$verified" "Behaviour coverage" | trim | or_default "Not produced."

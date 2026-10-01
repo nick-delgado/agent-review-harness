@@ -189,9 +189,37 @@ Rules:
 - Reply with one line: the number of findings and the output path.
 ```
 
-If the diff is very large (roughly over 1,500 changed lines or 40 files), spawn each reviewer
-once per area of the codebase and give each instance its file list, so that no reviewer has
-to skim.
+### Large PRs
+
+Count the changed lines from `files.json`, leaving out generated files, lock files,
+snapshots and vendored code. Over roughly 1,500 lines or 40 files, one reviewer would have
+to skim, so split the work:
+
+- **Standards and spec alignment run once, over the whole PR.** Their rules and
+  requirements span the PR, and the traceability table has to be one table.
+- **Code smells and test adequacy run in parts**, one per area of the codebase, each part
+  roughly 1,000 to 1,500 changed lines. Keep source and its tests in the same part, since
+  test adequacy maps each behaviour to its test. Split at package or directory boundaries,
+  not through the middle of one.
+- **Part k writes `findings/<name>--<k>.md`** (`code-smells--1.md`, `code-smells--2.md`)
+  and numbers its findings from k×100+1 (`SMELL-101`, `SMELL-201`), so parts never
+  overwrite each other's output or share an ID.
+- Add these lines to a part's prompt, after "Inputs":
+
+  ```text
+  You are part <k> of <n> of this review. Your files: <list>. Other parts cover the rest of
+  the diff. Write to <RUN_DIR>/findings/<name>--<k>.md and number your findings from
+  <k×100+1>. Search the whole codebase as your brief asks: report duplication, coupling and
+  missing tests that reach into files outside your list, citing them.
+  ```
+
+- Record the split in the manifest (which part covers which files) and in the run
+  metadata.
+
+The verifier reads every part, merges findings that two parts reported from opposite sides,
+and combines the parts' required tables into one. A PR too large to split this way (well
+over 10,000 changed lines) is too large to review well: tell the user, and suggest
+splitting the PR.
 
 **No subagent support in this runtime:** work through the briefs one at a time yourself, in
 the order above, writing each output file before starting the next. Record
@@ -203,8 +231,9 @@ When the reviewers finish, check their outputs:
 <SKILL_DIR>/scripts/check-outputs.sh "$RUN_DIR"
 ```
 
-It lists any reviewer whose output is missing or lacks a required section, including the
-extra tables some briefs require. Send that reviewer back to finish (continue the same
+It lists any reviewer (or part) whose output is missing or lacks a required section,
+including the extra tables some briefs require, and any part whose finding IDs fall outside
+its range. Send that reviewer back to finish (continue the same
 subagent if your runtime allows; otherwise spawn a fresh one with the same prompt and the
 list of what is missing), and run the check again. Also send back a reviewer whose findings
 lack evidence.
