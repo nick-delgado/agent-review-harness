@@ -100,8 +100,10 @@ unless the owner has decided it. A decision counts when:
   ```
 
   It accepts only lines naming the reviewed commit, posted after the review, outside the
-  harness's own comments, by someone with write access to the repository; a later decision
-  on the same finding replaces an earlier one. It also lists what it ignored and why.
+  harness's own comments, by the repository's owner or someone with write access; a later
+  decision on the same finding replaces an earlier one. Where the environment refuses the
+  access lookup, a collaborator's decision is accepted and marked "not confirmed": tell the
+  user so they can confirm it. It also lists what it ignored and why.
 
 Nothing else is a decision: not free-text comments, not your own reading of the
 recommendation. An answer that is an option's letter means that option as the report
