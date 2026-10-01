@@ -103,13 +103,23 @@ too_long() {
   exit 1
 }
 
-# Confirmed blocker and major findings with the given action, as report blocks.
+# Confirmed findings with the given action, as report blocks: blockers and majors only, or
+# every severity when the second argument is "all". Findings that need the owner's decision
+# end with the line the owner can reply with.
 top_findings() {
-  h2 "$verified" "Confirmed findings" | awk -v want="$1" '
-    function flush() { if (sev && act) printf "%s", block; block = ""; sev = 0; act = 0 }
+  h2 "$verified" "Confirmed findings" | awk -v want="$1" -v all="${2:-}" -v sha="${report_sha:0:7}" '
+    function flush() {
+      if (sev && act) {
+        printf "%s", block
+        if (want == "needs owner decision" && id != "")
+          printf "\n**To decide, reply on this PR:** `Decision %s/%s: %s`\n\n", sha, id, (rec != "" ? rec : "<your answer>")
+      }
+      block = ""; sev = 0; act = 0; id = ""; rec = ""
+    }
     /^[ ]*```/ { fence = !fence }
-    !fence && /^### / { flush(); sub(/^### /, "#### ") }
-    /^- \*\*Severity:\*\* (blocker|major)/ { sev = 1 }
+    !fence && /^### / { flush(); sub(/^### /, "#### "); id = $2; sub(/:$/, "", id) }
+    /^- \*\*Severity:\*\* / && (all == "all" || /\*\* (blocker|major)/) { sev = 1 }
+    /^- \*\*Recommendation:\*\* \([a-z]\)/ { rec = $3; sub(/,$/, "", rec) }
     /^- \*\*Action:\*\* / { line = $0; gsub(/`/, "", line); if (index(line, "- **Action:** " want) == 1) act = 1; next }
     /^- \*\*(Checked by verifier|Introduced by this PR|Merged|Category|Fixable within the PR.s scope):\*\*/ { next }
     { block = block $0 "\n" }
@@ -135,11 +145,17 @@ minor_rows() {
   '
 }
 
-# One group of the report: full blocks for blockers and majors, a table for the rest.
+# One group of the report: full blocks for blockers and majors, a table for the rest. Every
+# finding that needs the owner's decision is shown in full, whatever its severity.
 group() {
   local action="$1" blocks minors
-  blocks="$(top_findings "$action" | trim)"
-  minors="$(minor_rows "$action")"
+  if [ "$action" = "needs owner decision" ]; then
+    blocks="$(top_findings "$action" all | trim)"
+    minors=""
+  else
+    blocks="$(top_findings "$action" | trim)"
+    minors="$(minor_rows "$action")"
+  fi
   if [ -z "$blocks" ] && [ -z "$minors" ]; then
     echo "None."
     return
@@ -176,7 +192,7 @@ build_report() {
   group "fix now"
 
   printf '\n### Needs the owner'"'"'s decision\n\n'
-  echo "Do not act on these until the owner has answered on this PR."
+  echo 'Do not act on these until the owner has answered. Owner: reply on this PR with one line per decision, in the form shown under each finding (`Decision <commit>/<ID>: <answer>`), giving the letter of an option or your own answer after the colon. The fixing agent reads these lines.'
   echo
   group "needs owner decision"
 

@@ -82,17 +82,37 @@ Nits are optional: fix the ones that cost nothing, and record the rest as `not f
 
 ### 4. "Needs the owner's decision"
 
-Do nothing on these unless the owner has decided. A decision counts only when the user
-gives it to you in this session, or points you to the comment that contains it. Do not
-infer a decision from a PR comment on your own: you cannot tell who wrote it or whether it
-is final.
+Each of these findings lists options and a recommendation, and ends with the line the
+owner replies with: `Decision <reviewed commit>/<ID>: <answer>`. Do nothing on a finding
+unless the owner has decided it. A decision counts when:
+
+- the user gives it to you in this session, or
+- it is posted on the PR in that form. List those with
+
+  ```sh
+  <SKILL_DIR>/scripts/get-decisions.sh <pr-number> <reviewed sha>
+  ```
+
+  It accepts only lines naming the reviewed commit, posted after the review, outside the
+  harness's own comments, by someone with write access to the repository; a later decision
+  on the same finding replaces an earlier one. It also lists what it ignored and why.
+
+Nothing else is a decision: not free-text comments, not your own reading of the
+recommendation. An answer that is an option's letter means that option as the report
+describes it. An answer you cannot apply unambiguously is not a decision yet: ask the user.
+
+**Never write a line that starts with `Decision `** in any comment, commit message or PR
+description: those lines are how the owner speaks, and your account may be the owner's.
 
 When a decision has been given, implement it if it needs a code change, and record it in
 the response (step 7): the finding's status is `fixed`, or `decided, no change` when the
 decision needs none (for example, "keep the current behaviour" or "no ADR needed"), and
-the Decision column holds the decision in one sentence. Record the decision in the owner's
-terms, including the reason if they gave one: the project's process improvements are later
-built from these rows, so a decision that clarifies a rule should read as that rule.
+the Decision column holds the decision in one sentence, followed by where it came from (a
+link to the comment, or "in session"). Record the decision in the owner's terms, including
+the reason if they gave one: the project's process improvements are later built from these
+rows, so a decision that clarifies a rule should read as that rule. Name findings with the
+reviewed commit (`d34b6df/SPEC-1`) in the response's summary text, since IDs restart in
+every review round.
 
 Without a decision, the status is `waiting for decision`. Do not write decisions anywhere
 else: not on the tracking issue, not in docs or skills.
@@ -143,8 +163,8 @@ conversation shows each round in order. Format:
 
 | Finding | Status | Decision | Commit | Note |
 |---|---|---|---|---|
-| SPEC-1 | fixed | Return at most 5 slots; lower `LIMITS.availabilityMaxSlots` to 5 | `def5678` | |
-| STD-1 | decided, no change | The ban covers only the zero-argument clock read; parsing a stored value is fine | | |
+| SPEC-1 | fixed | (b) Return at most 5 slots; lower `LIMITS.availabilityMaxSlots` to 5 ([comment](https://github.com/o/r/pull/70#issuecomment-1)) | `def5678` | |
+| STD-1 | decided, no change | (a) The ban covers only the zero-argument clock read; parsing a stored value is fine (in session) | | |
 | SPEC-3 | waiting for decision | | | |
 | TEST-1 | fixed | | `abc1234` | Registry test added in `test/tools/find_providers.test.ts` |
 | TEST-2 | fixed | | `abc1234` | Seeded slots at 11:30 PM and 7:30 PM ET; fails on a UTC-day range |
@@ -152,7 +172,8 @@ conversation shows each round in order. Format:
 | SPEC-5 | for the owner | | | |
 ```
 
-Every finding in the report gets a row, in the report's order. Statuses: `fixed`,
+Every finding in the report gets a row, in the report's order. A finding you fixed in a
+different way from its suggested fix gets a note saying why. Statuses: `fixed`,
 `decided, no change`, `already fixed`, `disputed`, `not fixed`, `waiting for decision`,
 `for the owner`. A `disputed` or `not fixed` row always has a note with the reason. The
 Decision column is filled for every finding the owner decided, and left empty otherwise.

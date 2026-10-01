@@ -75,9 +75,9 @@ Then save the previous review, if this is a re-review:
 <SKILL_DIR>/scripts/get-previous.sh <n> "$RUN_DIR"
 ```
 
-It writes the latest report, the last report of each earlier reviewed commit, and every
-response from the authoring agent (from `address-pr-review`, oldest first) to
-`RUN_DIR/previous/`. Only the verifier reads them: the reviewers
+It writes the latest report, the last report of each earlier reviewed commit, every
+response from the authoring agent (from `address-pr-review`, oldest first), and the
+owner's decisions posted on the PR to `RUN_DIR/previous/`. Only the verifier reads them: the reviewers
 must not, so that they look at the code without being anchored on earlier findings.
 
 CI state goes into the report as a fact: passing, failing (which checks), pending, or none
@@ -118,9 +118,10 @@ subagent reads it. List paths and one-line descriptions; do not paste file conte
    grouped by area.
 2. **Spec sources** (task level) and **direction sources** (project level), from phase 2,
    each with its path or URL, and what was not found or not accessible. On a re-review,
-   the owner's decisions on earlier findings are part of the task spec: they are recorded
-   in `RUN_DIR/previous/responses.md` (the Decision column, or `decision:` notes). Reviewers
-   do not read that file, so state each decision here in one line.
+   the owner's decisions on earlier findings are part of the task spec: they are posted on
+   the PR (`RUN_DIR/previous/decisions.md`) and recorded in the authoring agent's responses
+   (`RUN_DIR/previous/responses.md`, the Decision column). Reviewers do not read those
+   files, so state each decision here in one line, named as `<commit>/<ID>`.
 3. **Standards sources**: every document that tells a contributor how to build here.
    `AGENTS.md`, `CLAUDE.md`, `GEMINI.md` (root and nested ones on the path to any changed
    file), `CONTRIBUTING.md`, `README.md` sections on conventions, `docs/` pages on

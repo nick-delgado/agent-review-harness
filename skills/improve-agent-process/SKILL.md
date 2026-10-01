@@ -70,7 +70,9 @@ file and intent, and keep the best-written version of each.
 ### 4. Collect the owner's decisions
 
 From the response comments, list every finding with a recorded decision: the PR, the
-review round and finding, the decision. A PR with no response comment, or a finding still `waiting for
+review round and finding (`<commit>/<ID>`), the decision. The owner posts decisions on the
+PR as `Decision <commit>/<ID>: <answer>` lines; the responses record them with a link, so
+the responses are enough. A PR with no response comment, or a finding still `waiting for
 decision`, has no decision; do not infer one from other comments.
 
 Decisions matter here in two ways:

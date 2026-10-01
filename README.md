@@ -179,12 +179,23 @@ tool or model:
 The review checks the PR out into a temporary git worktree and does not touch your working
 tree.
 
-**Fix.** Answer the "needs the owner's decision" findings on the PR. Then, in the session
-of the agent that works on the code:
+**Decide.** Each finding that needs your decision lists options (a), (b), ... with their
+consequences, a recommendation, and the line to reply with. Reply on the PR with one line
+per decision, giving a letter or your own answer:
+
+```
+Decision d34b6df/SPEC-1: (b)
+Decision d34b6df/SPEC-2: keep as is; the booking tool checks this
+```
+
+The commit in each line ties the decision to one review round, since finding IDs restart in
+every round. Only lines in this form, from someone with write access, count as decisions.
+
+**Fix.** Then, in the session of the agent that works on the code:
 
 > Use the address-pr-review skill on PR 123.
 
-Tell it your decisions in the same message, or point it to the comment that contains them.
+It picks up your `Decision` lines from the PR; you can also give decisions in the session.
 It pushes fixes to the PR branch and replies on the PR with one row per finding: fixed,
 disputed, not fixed, or waiting for a decision. It then recommends what comes next, from the
 verdict and the size of the change: nothing, a re-check, or a full review.
@@ -216,12 +227,14 @@ skills/
     scripts/assemble-report.sh       builds the PR comment and the tracking-issue comment
     scripts/post-report.sh           posts the report as a new PR comment
     scripts/post-process-findings.sh creates or updates the tracking-issue comment
-    scripts/get-previous.sh          saves earlier reports and responses for a re-review
+    scripts/get-previous.sh          saves earlier reports, responses and decisions for a re-review
+    scripts/get-decisions.sh         lists the owner's Decision lines for a review (same as above)
     scripts/check-citations.sh       checks every file:line citation against the code
     scripts/check-outputs.sh         checks each reviewer's output has its required sections
   address-pr-review/
     SKILL.md
     scripts/get-review.sh            prints the latest review report and whether the PR moved since
+    scripts/get-decisions.sh         lists the owner's Decision lines for a review
     scripts/post-response.sh         posts the response as a new PR comment
   improve-agent-process/
     SKILL.md

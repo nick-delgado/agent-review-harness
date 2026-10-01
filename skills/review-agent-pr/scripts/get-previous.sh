@@ -8,6 +8,8 @@
 #   earlier/report-<sha>.md   the last report of each earlier reviewed commit
 #   responses.md              every response from the authoring agent (address-pr-review),
 #                             oldest first, each under a header with its comment ID and time
+#   decisions.md              the owner's decisions posted on the PR ("Decision <sha>/<ID>:
+#                             ..." lines), per reviewed commit, from get-decisions.sh
 # Prints what was found, starting with "previous-commit: <sha>". Writes nothing and prints
 # "no previous review" when the PR has no report comment.
 # Run from inside a clone of the PR's repository. Requires an authenticated gh.
@@ -101,6 +103,17 @@ if [ -d "$out/earlier" ]; then
     echo "earlier round: $f"
   done
 fi
+
+# The owner's decisions, for the latest reviewed commit and each earlier one.
+here="$(cd "$(dirname "$0")" && pwd)"
+{
+  for s in $latest_sha $(ls "$out/earlier" 2>/dev/null | sed -n 's/^report-\([0-9a-f]*\)\.md$/\1/p'); do
+    printf '## Decisions on the review of %s\n\n' "${s:0:7}"
+    "$here/get-decisions.sh" "$pr" "$s" 2>&1 || true
+    echo
+  done
+} > "$out/decisions.md"
+echo "decisions: $out/decisions.md ($(grep -c '^| [0-9a-f]\{7\}/' "$out/decisions.md" || true) posted)"
 
 responses="$(
   gh api --paginate "repos/{owner}/{repo}/issues/${pr}/comments" \
