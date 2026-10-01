@@ -215,6 +215,7 @@ skills/
     scripts/post-process-findings.sh creates or updates the tracking-issue comment
     scripts/get-previous.sh          saves the previous report and response for a re-review
     scripts/check-citations.sh       checks every file:line citation against the code
+    scripts/check-outputs.sh         checks each reviewer's output has its required sections
   address-pr-review/
     SKILL.md
     scripts/get-review.sh            prints the latest review report on a PR
