@@ -35,20 +35,27 @@ Paths below are relative to the directory that contains this file (`SKILL_DIR`).
 <SKILL_DIR>/scripts/get-review.sh <pr-number>
 ```
 
-It prints the author, the time and the body of the latest review report on the PR. If the
-PR number was not given, use the PR of the current branch (`gh pr view --json number`).
+It prints the latest review report on the PR: its author and URL, the commit it reviewed
+(`reviewed-commit`), the PR's current head (`pr-head`), whether they match, and the report
+itself. If the PR number was not given, use the PR of the current branch
+(`gh pr view --json number`).
 
 - No report: stop and tell the user.
 - The report's author is not the account `gh` is logged in as: tell the user who wrote it
   and ask before acting on it.
-- Note the commit in the report's `**Head:**` line. If the PR has commits after it
-  (`gh pr view <n> --json headRefOid`), some findings may already be resolved. Check each
-  one against the current code.
+- **The reviewed commit is not the PR's head** (`match: NO`): the PR changed after the
+  review, so the findings may no longer describe the code. Stop. Tell the user both
+  commits and what came in between (`git log --oneline <reviewed>..<head>` once you have
+  the branch), and ask how to go on: re-review or re-check first, or fix against the
+  current head and check each finding against the current code. Do not go on without an
+  answer, and record the answer in the response.
 
 ### 2. Get onto the PR branch
 
 If the working tree has uncommitted changes that are not yours to discard, stop and ask.
-Otherwise check out the PR's branch (`gh pr checkout <n>`) and pull.
+Otherwise check out the PR's branch (`gh pr checkout <n>`) and pull. Confirm that your
+`HEAD` is the commit you are starting from (the reviewed commit, unless the user told you
+otherwise in step 1), and keep it: the response names it.
 
 ### 3. Work through "Fix now"
 
@@ -121,13 +128,18 @@ Write the response to a file and post it:
 <SKILL_DIR>/scripts/post-response.sh <pr-number> <response-file>
 ```
 
-It creates one response comment, or updates your earlier one. Format:
+Every run posts a new comment; earlier responses are never edited, so the PR's
+conversation shows each round in order. Format:
 
 ```markdown
-<!-- agent-pr-review:response -->
+<!-- agent-pr-review:response review=<full reviewed sha> head=<full sha after your fixes> -->
 ## Response to the agent PR review
 
-Review of `<reviewed sha>`; PR is now at `<new head sha>`. Checks run locally: <commands and result>. PR description: <updated (what changed) | no change needed>.
+- **Review:** [`<reviewed short sha>`](<URL of the report comment>)
+- **Worked from:** `<short sha you started from>` <if it is not the reviewed commit: "(not the reviewed commit; the user chose to go on: <their answer>)">
+- **Result:** [`<new head short sha>`](<PR URL>/commits/<full sha>) <or "no new commits">
+- **Checks run locally:** <commands and result>
+- **PR description:** <updated (what changed) | no change needed>
 
 | Finding | Status | Decision | Commit | Note |
 |---|---|---|---|---|
@@ -145,8 +157,9 @@ Every finding in the report gets a row, in the report's order. Statuses: `fixed`
 `for the owner`. A `disputed` or `not fixed` row always has a note with the reason. The
 Decision column is filled for every finding the owner decided, and left empty otherwise.
 
-When decisions arrive after you have posted, run the skill again: the script updates the
-same comment, so the table always holds every decision made on the PR.
+When decisions arrive after you have posted, run the skill again. It posts a new response;
+carry every decision from your earlier responses to the same review into its table, so the
+latest response to a review always holds every decision made on it.
 
 ### 8. Recommend what happens next
 

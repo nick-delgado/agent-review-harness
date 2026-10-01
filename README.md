@@ -34,7 +34,7 @@ the `gh` CLI.
             │                    │                  tests, CI checks
    address-pr-review             │
             │                    │
-   fixes pushed, reply posted ───┘ (re-review updates both comments in place)
+   fixes pushed, reply posted ───┘ (each review and each reply is a new comment)
 ```
 
 ## What a review does
@@ -68,7 +68,10 @@ result.
 
 ## The PR comment
 
-One general comment on the PR, updated in place on a re-run. It holds code findings only:
+One general comment on the PR per review run. Earlier reports are never edited, so the PR's
+conversation is the audit trail: each report names the commit it reviewed (linked), and each
+response from the fixing agent names the review it answers, the commit it started from and
+the commit it produced. It holds code findings only:
 
 - a verdict, and the confirmed findings, each with `file:line`, the quoted code and the
   quoted rule or spec clause it breaks;
@@ -211,15 +214,15 @@ skills/
     analysts/                        verifier and root-cause analyst briefs
     references/                      finding format, cause taxonomy, output layout
     scripts/assemble-report.sh       builds the PR comment and the tracking-issue comment
-    scripts/post-report.sh           creates or updates the PR comment
+    scripts/post-report.sh           posts the report as a new PR comment
     scripts/post-process-findings.sh creates or updates the tracking-issue comment
-    scripts/get-previous.sh          saves the previous report and response for a re-review
+    scripts/get-previous.sh          saves earlier reports and responses for a re-review
     scripts/check-citations.sh       checks every file:line citation against the code
     scripts/check-outputs.sh         checks each reviewer's output has its required sections
   address-pr-review/
     SKILL.md
-    scripts/get-review.sh            prints the latest review report on a PR
-    scripts/post-response.sh         creates or updates the response comment
+    scripts/get-review.sh            prints the latest review report and whether the PR moved since
+    scripts/post-response.sh         posts the response as a new PR comment
   improve-agent-process/
     SKILL.md
     scripts/get-process-log.sh       prints the tracking issue and its comments

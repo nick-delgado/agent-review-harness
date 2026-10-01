@@ -2,7 +2,7 @@
 # Assemble the review's two outputs from the phase outputs in a run directory.
 #
 # Usage:
-#   assemble-report.sh <run-dir> report
+#   assemble-report.sh <run-dir> report <head-sha>
 #       Reads  report-head.md, report-meta.md, verified.md, findings/*.md
 #       Writes report.md: the PR comment (code findings and evidence).
 #
@@ -15,11 +15,10 @@
 
 set -euo pipefail
 
-REPORT_MARKER='<!-- agent-pr-review:report -->'
 SOFT_LIMIT=60000
 
 usage() {
-  echo "usage: $(basename "$0") <run-dir> report" >&2
+  echo "usage: $(basename "$0") <run-dir> report <head-sha>" >&2
   echo "       $(basename "$0") <run-dir> process <pr-number> <head-sha>" >&2
   exit 2
 }
@@ -168,7 +167,7 @@ label() {
 build_report() {
   local with_tables="$1" r f
 
-  echo "$REPORT_MARKER"
+  echo "<!-- agent-pr-review:report sha=$report_sha -->"
   trim < "$run/report-head.md"
 
   printf '\n### Fix now\n\n'
@@ -288,7 +287,9 @@ build_process() {
 
 case "$mode" in
   report)
-    [ "$#" -eq 2 ] || usage
+    [ "$#" -eq 3 ] || usage
+    report_sha="$3"
+    printf '%s' "$report_sha" | grep -qE '^[0-9a-f]{40}$' || { echo "error: give the full 40-character reviewed commit, got '$report_sha'" >&2; exit 2; }
     for required in "$run/report-head.md" "$run/report-meta.md" "$verified"; do
       [ -s "$required" ] || { echo "error: missing or empty $required" >&2; exit 1; }
     done

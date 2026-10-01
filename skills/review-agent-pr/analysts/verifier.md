@@ -104,19 +104,22 @@ for a test, work out whether it would really fail if the behaviour were broken.
 If `<RUN_DIR>/previous/report.md` exists, the PR was reviewed before. List every finding in
 it: the full blocks, the rows of every table, and any "Previous findings" table it carries
 forward from earlier rounds. `<RUN_DIR>/previous/earlier/` may hold the reports of earlier
-rounds, recovered from the comment's edit history; add their findings too, except those a
-later round already settled as `resolved` or `withdrawn`. For each, settle its status at
+reviewed commits; add their findings too, except those a later round already settled as
+`resolved` or `withdrawn`. Finding IDs restart in every round, so name a previous finding
+by its round as well: `6c20495/SPEC-1`. For each, settle its status at
 the current head:
 
 | Status | When |
 |---|---|
 | `resolved` | The problem is gone. Cite the code or test that shows it (`file:line`). |
 | `still present` | The problem is still there. Unless a reviewer reported it again, add it back as a confirmed finding under its original ID, re-checked through steps 1 to 8. |
-| `decided` | The owner decided it (see `<RUN_DIR>/previous/response.md`, the Decision column or a `decision:` note). Check that the code matches the decision; if it does not, it is `still present`. |
+| `decided` | The owner decided it (see `<RUN_DIR>/previous/responses.md`, the Decision column or a `decision:` note). Check that the code matches the decision; if it does not, it is `still present`. |
 | `for the owner` | It was marked for the owner and nothing in this PR changed that. |
 | `withdrawn` | On a second look it was never a problem (the earlier review was wrong). Say why. |
 
-The response file holds the authoring agent's claims ("fixed", "disputed"). Treat them as
+The responses file holds the authoring agent's responses, oldest first, each naming the
+reviewed commit it answers and the commit it produced. They are claims ("fixed",
+"disputed"). Treat them as
 claims to check, not as evidence. For a disputed finding, judge the dispute on the code.
 
 ## Re-check mode
