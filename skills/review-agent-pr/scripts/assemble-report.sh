@@ -241,6 +241,26 @@ build_report() {
   echo
   group "for the owner"
 
+  # Re-reviews: findings in code unchanged since the last review that do not block.
+  local noticed
+  noticed="$(minor_rows "noticed")"
+  if [ -n "$noticed" ]; then
+    printf '\n### Noticed in unchanged code (not blocking)\n\n'
+    echo "Found in code this PR has not changed since the last review. Not part of this PR's work and not counted in the verdict; worth a follow-up issue if they matter."
+    echo
+    printf '%s\n' "$noticed"
+  fi
+
+  local convergence
+  convergence="$(h2 "$verified" "Convergence" | trim)"
+  case "$convergence" in
+    "" | "First review."*) ;;
+    *)
+      printf '\n### Convergence\n\n'
+      printf '%s\n' "$convergence"
+      ;;
+  esac
+
   local previous
   previous="$(h2 "$verified" "Previous findings" | trim)"
   case "$previous" in
@@ -342,7 +362,7 @@ case "$mode" in
     for required in "$run/report-head.md" "$run/report-meta.md" "$verified"; do
       [ -s "$required" ] || { echo "error: missing or empty $required" >&2; exit 1; }
     done
-    need "$verified" "Confirmed findings" "Minor findings table" "Rejected findings" "Spot checks" "Previous findings" "Verification summary" "Reviewer tables"
+    need "$verified" "Confirmed findings" "Minor findings table" "Rejected findings" "Spot checks" "Previous findings" "Convergence" "Verification summary" "Reviewer tables"
     fail_if_missing
     confirmed="$(h2 "$verified" "Confirmed findings")"
     case "$confirmed" in

@@ -1,6 +1,8 @@
 ---
 name: address-pr-review
 description: Fix the code findings of an agent PR review. Reads the review report that the review-agent-pr skill posted as a comment on a GitHub pull request, fixes the findings marked "Fix now" on the PR branch, applies the owner's decisions, asks the owner once about anything it could not do within the PR's scope, and replies on the PR with what was done for each finding. Use when asked to address, fix, resolve or respond to the review report or review findings on a PR.
+metadata:
+  harness-version: "2026.10.02"
 ---
 
 # Address a PR review
@@ -84,6 +86,13 @@ Take them in order (blockers and majors first). For each finding:
    use its skills, as for any other change. Make the smallest change that resolves the
    finding. When the finding is about a test, make the test able to fail: break the line it
    is about, see the test fail, then restore it.
+   - **Fix the class, not just the instance.** If the finding is one case of a pattern
+     (one missing case among similar ones, one parser rule among several), search the PR's
+     own changes for the same mistake and fix every instance, testing each.
+   - **Claim only what you did.** In commit messages, test names and headers, and the PR
+     description, name what you covered. Never write "every", "all" or "each … has a test
+     that fails": a broad claim the tests do not fully back becomes a major finding in the
+     next review.
 3. **If the fix needs a file outside the task's scope**, would change a rule rather than a
    fact, or turns out to need a product decision after all, do not make it. Add it to your
    questions for the owner (step 5) and go on with the next finding: do not stop to ask.
@@ -197,6 +206,7 @@ conversation shows each round in order. Format:
 - **Worked from:** `<short sha you started from>` <if it is not the reviewed commit: "(not the reviewed commit; the user chose to go on: <their answer>)">
 - **Result:** [`<new head short sha>`](<PR URL>/commits/<full sha>) <or "no new commits">
 - **Checks run locally:** <commands and result>
+- **Harness version:** <`metadata.harness-version` from this skill's frontmatter>
 - **PR description:** <updated (what changed) | no change needed>
 - **Waiting for the owner:** <every `waiting for decision` and `not fixed: needs owner` finding, one line each with its question; or "nothing">
 
@@ -227,17 +237,20 @@ latest response to a review always holds every decision made on it.
 Measure the change since the reviewed commit:
 
 ```sh
-git diff --shortstat <reviewed sha> HEAD
-git diff --name-status --diff-filter=A <reviewed sha> HEAD     # files added since
+<SKILL_DIR>/scripts/diff-size.sh <reviewed sha> HEAD
 ```
+
+It counts source, test and other lines separately, lists new source files, and gives the
+PR's total source lines (`pr-source`). Test files do not count toward the sizes below: a
+fix round usually adds many tests.
 
 Then recommend exactly one of these, and give the reason and the numbers:
 
 | Recommend | When |
 |---|---|
-| **No further review needed** | The report's verdict was `Acceptable`; you fixed only minors and nits; you implemented no owner decision with a code change; nothing is `disputed`, `not fixed: needs owner` or waiting for a decision; the change is under about 50 lines with no new files; and the checks pass. The owner can check the response table and the diff by eye. |
-| **A re-check** (`review-agent-pr` in re-check mode, in a fresh session) | Anything else, as long as the change is contained: no new source files and under about 300 changed lines. This covers fixed blockers and majors, implemented decisions, and disputes, which the re-check settles on the code. |
-| **A full review** (`review-agent-pr`, in a fresh session) | The change adds source files, changes more than about 300 lines, or goes beyond the findings and decisions (a refactor, new behaviour). |
+| **No further review needed** | The report's verdict was `Acceptable`; you fixed only minors and nits; you implemented no owner decision with a code change; nothing is `disputed`, `not fixed: needs owner` or waiting for a decision; the source change is under about 50 lines with no new source files; and the checks pass. The owner can check the response table and the diff by eye. |
+| **A re-check** (`review-agent-pr` in re-check mode, in a fresh session) | Anything else, as long as the fixes stay within the findings and decisions and the source change is contained: no more than about 300 lines or 20% of `pr-source`, whichever is larger, and no new source file over about 150 lines. This covers fixed blockers and majors, implemented decisions, and disputes, which the re-check settles on the code. |
+| **A full review** (`review-agent-pr`, in a fresh session) | The source change is larger than that, or the fixes go beyond the findings and decisions (a refactor nobody asked for, new behaviour). |
 
 If the checks failed, say so first: the fixes are not ready for any review.
 

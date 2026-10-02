@@ -289,6 +289,16 @@ To add a reviewer: write a brief in `reviewers/`, give it a finding prefix, and 
 the table in phase 4 of `SKILL.md`, to `references/report-template.md` and to the reviewer
 list in `scripts/assemble-report.sh`.
 
+## Versioning
+
+Each skill's frontmatter carries `metadata.harness-version` (a date, `YYYY.MM.DD`, with a
+suffix for a second change on the same day). Reports and responses print it, so you can
+tell which version produced them. Bump it in every skill that changes.
+
+If a project commits copies of these skills (for example under `.agents/skills/`), those
+copies do not update themselves: refresh them with `npx skills update` or `install.sh`, or
+keep the skills out of the project and install them per user.
+
 ## Status
 
 Early. `review-agent-pr` has been run end to end against one real PR from Claude Code, with

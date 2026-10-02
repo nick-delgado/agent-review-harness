@@ -6,6 +6,8 @@ arguments: [pr, mode]
 context: fork
 agent: general-purpose
 background: false
+metadata:
+  harness-version: "2026.10.02"
 ---
 
 You are starting a review of pull request $pr in a fresh context. You have none of the

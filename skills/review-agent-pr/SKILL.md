@@ -1,6 +1,8 @@
 ---
 name: review-agent-pr
 description: Thorough multi-reviewer review of a GitHub pull request that was produced by an AI coding agent. Runs parallel specialist reviewers (documented standards, code smells, spec alignment, test adequacy), verifies every finding, and posts one evidence-backed report as a PR comment that separates what the agent should fix from what needs the owner's decision. Also analyses why the agent produced each issue and logs the causes and proposed improvements to the project's docs, prompts, skills and tests on a tracking issue. Use when asked to review, audit or evaluate a PR or branch written by an AI agent, or to find out why an agent's output went wrong. Also runs a cheaper re-check of a PR that was reviewed before, verifying only what changed since and what became of each earlier finding, when asked to re-check a PR.
+metadata:
+  harness-version: "2026.10.02"
 ---
 
 # Review an agent-authored PR
@@ -92,6 +94,19 @@ response from the authoring agent (from `address-pr-review`, oldest first), and 
 owner's decisions posted on the PR to `RUN_DIR/previous/`. Only the verifier reads them: the reviewers
 must not, so that they look at the code without being anchored on earlier findings.
 
+On a re-review, also list the lines changed since the previous reviewed commit (the
+`previous-commit` that `get-previous.sh` printed):
+
+```sh
+<SKILL_DIR>/scripts/changed-lines.sh "$RUN_DIR" <previous commit>
+```
+
+It writes `RUN_DIR/changed-lines.txt`. A re-review weighs findings by whether they are in
+changed code (see "Re-reviews" in the finding schema): without that, every round grades the
+whole PR from scratch, finds new things in code it has already passed, and never converges.
+If the previous commit is not in the branch's history (a rebase or force-push), say so in
+the manifest and review as a first review.
+
 CI state goes into the report as a fact: passing, failing (which checks), pending, or none
 configured. A failing or pending CI does not stop the review.
 
@@ -150,7 +165,8 @@ subagent reads it. List paths and one-line descriptions; do not paste file conte
 6. **Gaps**: anything expected and absent (no standards docs, no spec, no tests directory).
 7. **Previous review**: the commit the previous report reviewed, and whether a response
    exists, or "none". Name the files in `RUN_DIR/previous/` but say that only the verifier
-   reads them.
+   reads them. Name `RUN_DIR/changed-lines.txt`, which the reviewers do read, and say how
+   many review rounds there have been.
 
 ## Phase 4: Specialist reviews (parallel)
 
@@ -187,6 +203,11 @@ Rules:
 - Cite lines as they are numbered in the files under <RUN_DIR>/worktree (use grep -n or read
   the file). Never cite a position in diff.patch.
 - Do not read <RUN_DIR>/previous/.
+- If <RUN_DIR>/changed-lines.txt exists, this PR was reviewed before and the file lists the
+  lines changed since. Review changed code fully. In code unchanged since then, report
+  blockers and major behaviour defects (wrong results, misclassification, crashes, data
+  loss or exposure, safety or security) as usual, and at most three other findings, the
+  ones that matter most.
 - Write your full output to <RUN_DIR>/findings/<name>.md in the required format.
 - Reply with one line: the number of findings and the output path.
 ```
@@ -336,8 +357,19 @@ Follow the phases above with these differences.
   git -C "$RUN_DIR/worktree" diff <previous sha> HEAD > "$RUN_DIR/recheck.patch"
   ```
 
-  If the changes add a new source file, or `recheck.patch` changes more than about 300
-  lines, a re-check is too narrow: tell the user and run a full review instead.
+  Then measure the change:
+
+  ```sh
+  <SKILL_DIR>/scripts/diff-size.sh <previous sha> HEAD "$RUN_DIR/worktree"
+  ```
+
+  It separates source from tests and other files. Test files do not count: a fix round
+  usually adds many tests, and tests are what the re-check reads most closely anyway. A
+  re-check is right when the source change is no more than about 300 lines or 20% of the
+  PR's source lines (`pr-source`), whichever is larger, and no new source file is over
+  about 150 lines. Otherwise tell the user why and run a full review; a full review is
+  also right when the fixes go beyond the findings and decisions (a refactor nobody asked
+  for, new behaviour).
 - **Phases 2 and 3:** as usual. The manifest's previous-review section also names
   `recheck.patch`.
 - **Phase 4:** skipped. `RUN_DIR/findings/` stays empty.
