@@ -26,6 +26,9 @@ EOF
 }
 
 src_root="$(cd "$(dirname "$0")" && pwd)/skills"
+# Skills that use Claude Code-only frontmatter; installed for Claude Code only.
+claude_root="$(cd "$(dirname "$0")" && pwd)/claude-code/skills"
+claude_dest=""
 
 target=""
 scope="project"
@@ -91,7 +94,8 @@ IFS=','
 for tool in $tools; do
   case "$tool" in
     claude)
-      if [ "$scope" = "user" ]; then add_dest "$HOME/.claude/skills"; else add_dest "$target/.claude/skills"; fi
+      if [ "$scope" = "user" ]; then claude_dest="$HOME/.claude/skills"; else claude_dest="$target/.claude/skills"; fi
+      add_dest "$claude_dest"
       ;;
     codex)
       if [ "$scope" = "user" ]; then add_dest "$HOME/.agents/skills"; else add_dest "$target/.agents/skills"; fi
@@ -111,7 +115,9 @@ IFS="$old_ifs"
 [ -n "$dests" ] || { echo "error: no tools selected" >&2; exit 2; }
 
 echo "$dests" | while IFS= read -r dest; do
-  for skill in "$src_root"/*/; do
+  extra=""
+  [ "$dest" = "$claude_dest" ] && [ -d "$claude_root" ] && extra="$claude_root"
+  for skill in "$src_root"/*/ ${extra:+"$extra"/*/}; do
     [ -f "${skill}SKILL.md" ] || continue
     skill="${skill%/}"
     name="$(basename "$skill")"

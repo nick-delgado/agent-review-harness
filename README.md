@@ -160,7 +160,7 @@ Clone this repository next to the project, then:
 | Codex | `.agents/skills/` | `~/.agents/skills/` |
 | Antigravity | `.agents/skills/` | `~/.gemini/config/skills/` |
 
-The installer copies all three skills. A user-level install keeps the harness out of the
+The installer copies all three skills, plus `fresh-pr-review` for Claude Code. A user-level install keeps the harness out of the
 reviewed repository. A project install can be committed so the whole team, and the agents
 working in the repository, have it.
 
@@ -186,6 +186,24 @@ tool or model:
 
 The review checks the PR out into a temporary git worktree and does not touch your working
 tree.
+
+**Review from the coding session (Claude Code only).** Instead of a second session, the
+coding session can start the review in a forked context that sees none of its
+conversation:
+
+```
+/fresh-pr-review 123
+/fresh-pr-review 123 re-check
+```
+
+The fork runs `review-agent-pr` with only the PR number and mode (any other text in the
+command is dropped), checks the PR out into its own worktree, and spawns the reviewers as
+usual. Your session waits for it and gets back the verdict and links; push your commits
+first, since the review reads the PR from GitHub. This skill uses Claude Code-only
+frontmatter (`context: fork`), which the Agent Skills reference validator and Codex
+reject, so it lives in `claude-code/skills/` and only `install.sh` installs it, into
+Claude Code's directory alone. With the skills CLI, copy `claude-code/skills/fresh-pr-review`
+into `.claude/skills/` by hand.
 
 **Decide.** Each finding that needs your decision lists options (a), (b), ... with their
 consequences, a recommendation, and the line to reply with. Reply on the PR with one line
@@ -257,6 +275,8 @@ skills/
   improve-agent-process/
     SKILL.md
     scripts/get-process-log.sh       prints the tracking issue and its comments
+claude-code/skills/
+  fresh-pr-review/             Claude Code only: runs review-agent-pr in a forked context
 install.sh
 ```
 

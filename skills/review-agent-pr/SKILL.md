@@ -26,7 +26,9 @@ it to an absolute path once and use absolute paths whenever you hand a path to a
 
 - **Run in a fresh session.** If this session contains the work that produced the PR, or a
   discussion of it, stop and tell the user to start a new session: your context is already
-  biased toward the author's reasoning.
+  biased toward the author's reasoning. In Claude Code, the `fresh-pr-review` skill (if
+  installed) starts this skill in a forked context with no conversation history, which
+  counts as a fresh session.
 - **Read-only on the project.** Nothing in this skill edits, commits to or pushes the
   repository. Its only outward actions are the two comments posted in phase 7.
 - **Do not run tests, linters, type checkers or builds.** CI owns those. Read the CI result
