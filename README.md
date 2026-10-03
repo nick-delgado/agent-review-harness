@@ -116,6 +116,17 @@ the agent being reviewed.
   and skills from the PR's own branch, not from the default branch. Changing a skill
   afterwards does not move the goalposts for PRs already open. (The linked issue is read
   live, so edits to the issue do apply.)
+- **Fix, then sync, then re-check.** The fixing agent fixes each PR against the commit that
+  was reviewed, and only then merges the base branch in (never a rebase), resolving
+  mechanical conflicts itself and asking you about conflicts in logic. It then checks that
+  the PR is mergeable and that CI started: GitHub's `pull_request` CI runs on a trial merge,
+  so a PR with a conflict silently gets no CI at all. The re-check reviews the fixes and the
+  conflict resolutions but not what came in from the base branch, and checks whether
+  changes other PRs made to code this PR relies on break it. A review stops on a PR that
+  has a merge conflict, since resolving it will change the code.
+- **Make CI run even with a conflict** (in the project, not the harness): add a `push`
+  trigger for PR branches to the CI workflow, so the branch head is tested even when the
+  trial merge cannot be built.
 - **Work in rounds.** Review the whole queue under the current rules. Expect the same
   defects to repeat: that repetition is the evidence. Get the code fixed and merged. Then
   run `improve-agent-process`, merge its PR, and start the next batch of work under the new
