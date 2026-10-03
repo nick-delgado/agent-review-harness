@@ -109,7 +109,8 @@ Then, across all files:
     "Suggestions and options" in the finding schema:
     - **Suggested fix:** check it against the code. Is it correct, the smallest fix that
       resolves the finding, free of any product decision, and does it use what already
-      exists? Do two findings' fixes touch the same code, conflict, or make each other
+      exists? If it adds a constant, type, schema or helper, search for an existing one
+      first and name it in the fix ("import `X` from `path`"), or say that none exists. Do two findings' fixes touch the same code, conflict, or make each other
       unnecessary? Then make them consistent and say so in each. Rewrite what falls short.
     - **Done when:** present and checkable, with a check for each condition or case when the
       fix has several.
