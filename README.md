@@ -116,6 +116,10 @@ the agent being reviewed.
   and skills from the PR's own branch, not from the default branch. Changing a skill
   afterwards does not move the goalposts for PRs already open. (The linked issue is read
   live, so edits to the issue do apply.)
+- **When to merge the base branch in.** Before a PR's first review, merge it in freely (a
+  review stops on a PR with a merge conflict). After a review, leave it to the fixing agent,
+  which merges it after its fixes. If someone merges it in between anyway, the fixing agent
+  notices that only the base came in and carries on.
 - **Fix, then sync, then re-check.** The fixing agent fixes each PR against the commit that
   was reviewed, and only then merges the base branch in (never a rebase), resolving
   mechanical conflicts itself and asking you about conflicts in logic. It then checks that
