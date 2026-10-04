@@ -304,6 +304,20 @@ To add a reviewer: write a brief in `reviewers/`, give it a finding prefix, and 
 the table in phase 4 of `SKILL.md`, to `references/report-template.md` and to the reviewer
 list in `scripts/assemble-report.sh`.
 
+## Measuring the project's process changes
+
+Every finding is tagged with a **failure class**, what went wrong (a test that cannot fail,
+a claim beyond the evidence, an unflagged spec guess, duplication, ...), as well as with a
+cause, why. Causes drift as a project's rules change; failure classes do not, so they are
+what the project counts. Each tracking-issue comment starts with a data line (first review
+or re-review, changed lines, when the work began, harness version), and each change a batch
+makes has an ID and a target class. `improve-agent-process` starts by measuring every
+earlier change against PRs begun after it merged, and a change of words that failed is
+followed by a guardrail or a removal, not by more words.
+
+While a project measures, the reviewer is held steady: see `HELD.md` for changes waiting
+until the window ends.
+
 ## Versioning
 
 Each skill's frontmatter carries `metadata.harness-version` (a date, `YYYY.MM.DD`, with a
