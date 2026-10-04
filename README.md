@@ -213,7 +213,11 @@ first, since the review reads the PR from GitHub. A separate session (or another
 model, for a different perspective) still works the same way.
 
 Run it in the main session, not as a subagent or forked skill: the review waits for many
-subagents, and in some environments a subagent cannot wait for subagents of its own.
+subagents, and in some environments a subagent cannot wait for subagents of its own. The
+waiting does not hold the session: between subagent notifications it takes your messages
+as usual, so you can keep coding (through subagents, ideally) while a review runs. If the
+session is interrupted or its context is compacted, asking for the same review again
+resumes it from the last finished phase, without posting anything twice.
 
 **Decide.** Each finding that needs your decision lists options (a), (b), ... with their
 consequences, a recommendation, and the line to reply with. Reply on the PR with one line
