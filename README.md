@@ -15,7 +15,7 @@ the `gh` CLI.
 
 | Skill | Who runs it | What it does |
 |---|---|---|
-| `review-agent-pr` | A reviewer, in a fresh session | Reviews the PR, posts the code findings as one PR comment, and logs causes and proposals on a tracking issue |
+| `review-agent-pr` | Any session, including the coding one | Reviews the PR, posts the code findings as one PR comment, and logs causes and proposals on a tracking issue |
 | `address-pr-review` | The agent that works on the PR | Fixes the findings marked "Fix now" and replies on the PR, finding by finding |
 | `improve-agent-process` | You, once several reviews are logged | Reads the tracking issue across reviews and opens one batched PR with the process changes worth making |
 
@@ -175,7 +175,7 @@ Clone this repository next to the project, then:
 | Codex | `.agents/skills/` | `~/.agents/skills/` |
 | Antigravity | `.agents/skills/` | `~/.gemini/config/skills/` |
 
-The installer copies all three skills, plus `fresh-pr-review` for Claude Code. A user-level install keeps the harness out of the
+The installer copies all three skills. A user-level install keeps the harness out of the
 reviewed repository. A project install can be committed so the whole team, and the agents
 working in the repository, have it.
 
@@ -202,23 +202,18 @@ tool or model:
 The review checks the PR out into a temporary git worktree and does not touch your working
 tree.
 
-**Review from the coding session (Claude Code only).** Instead of a second session, the
-coding session can start the review in a forked context that sees none of its
-conversation:
+**Review from the coding session.** You do not need a second session. Every judgement in
+the review (findings, verification, causes, the report's summary) is made by subagents
+that start with no conversation history; the session that runs the skill only runs
+scripts, spawns those subagents with fixed prompts and assembles their files. The skill
+holds that session to rules that keep its own context out: it adds nothing to the
+subagents' prompts, writes the manifest only from what the repository and GitHub show, and
+never edits their output. So the coding session can run it directly; push your commits
+first, since the review reads the PR from GitHub. A separate session (or another tool or
+model, for a different perspective) still works the same way.
 
-```
-/fresh-pr-review 123
-/fresh-pr-review 123 re-check
-```
-
-The fork runs `review-agent-pr` with only the PR number and mode (any other text in the
-command is dropped), checks the PR out into its own worktree, and spawns the reviewers as
-usual. Your session waits for it and gets back the verdict and links; push your commits
-first, since the review reads the PR from GitHub. This skill uses Claude Code-only
-frontmatter (`context: fork`), which the Agent Skills reference validator and Codex
-reject, so it lives in `claude-code/skills/` and only `install.sh` installs it, into
-Claude Code's directory alone. With the skills CLI, copy `claude-code/skills/fresh-pr-review`
-into `.claude/skills/` by hand.
+Run it in the main session, not as a subagent or forked skill: the review waits for many
+subagents, and in some environments a subagent cannot wait for subagents of its own.
 
 **Decide.** Each finding that needs your decision lists options (a), (b), ... with their
 consequences, a recommendation, and the line to reply with. Reply on the PR with one line
@@ -248,12 +243,13 @@ verdict and the size of the change: nothing, a re-check, or a full review.
 
 **Re-check.** After fixes, a re-check is usually enough and costs about a fifth of a full
 review: the four reviewers do not run, and one verifier checks the changes since the
-reviewed commit and settles each earlier finding. In a fresh session:
+reviewed commit and settles each earlier finding:
 
 > Use the review-agent-pr skill to re-check PR 123.
 
-It falls back to a full review when there is no earlier review, the branch was rebased, or
-the change adds files or runs past about 300 lines.
+It falls back to a full review when there is no earlier review, the earlier commit cannot be
+fetched, or the PR's own source changes run past about 300 lines or 20% of the PR (tests
+and changes merged in from the base branch do not count).
 
 **Improve.** When several reviews are logged:
 
@@ -290,8 +286,6 @@ skills/
   improve-agent-process/
     SKILL.md
     scripts/get-process-log.sh       prints the tracking issue and its comments
-claude-code/skills/
-  fresh-pr-review/             Claude Code only: runs review-agent-pr in a forked context
 install.sh
 ```
 
@@ -316,7 +310,6 @@ keep the skills out of the project and install them per user.
 
 ## Status
 
-Early. `review-agent-pr` has been run end to end against one real PR from Claude Code, with
-the orchestration driven by hand; it has not been triggered by name in a fresh session, or
-run in Codex or Antigravity. `address-pr-review` and `improve-agent-process` have not been
-run.
+In use on one project. All three skills have run on real PRs, in Claude Code (locally and
+in cloud sessions) and in Antigravity; Codex has not been tried. The harness changes often:
+check `metadata.harness-version` in a report or response to see which version produced it.
