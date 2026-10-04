@@ -119,7 +119,9 @@ the agent being reviewed.
 - **When to merge the base branch in.** Before a PR's first review, merge it in freely (a
   review stops on a PR with a merge conflict). After a review, leave it to the fixing agent,
   which merges it after its fixes. If someone merges it in between anyway, the fixing agent
-  notices that only the base came in and carries on.
+  notices that only the base came in and carries on. If the base moves again after the
+  fixes, before the re-check, ask the fixing agent to "bring PR <n> up to date": its
+  sync-only mode merges, resolves or raises conflicts, and confirms CI started.
 - **Fix, then sync, then re-check.** The fixing agent fixes each PR against the commit that
   was reviewed, and only then merges the base branch in (never a rebase), resolving
   mechanical conflicts itself and asking you about conflicts in logic. It then checks that
