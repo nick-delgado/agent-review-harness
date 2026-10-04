@@ -1,7 +1,8 @@
 # agent-review-harness
 
-Skills for reviewing pull requests written by AI coding agents, getting the code fixed, and
-working out why the agent produced the problems the review finds.
+Skills for reviewing the work of AI coding agents at both ends, the issue before an agent
+starts it and the pull request after, getting the code fixed, and working out why the agent
+produced the problems the review finds.
 
 An ordinary code review lists defects. This harness also treats each defect as evidence
 about the project's agent setup: the instruction files, skills, specs and guardrails the
@@ -11,10 +12,11 @@ recur into concrete changes, so the same problem does not come back on the next 
 Works with Claude Code, OpenAI Codex and Google Antigravity. GitHub only for now, through
 the `gh` CLI.
 
-## The three skills
+## The skills
 
 | Skill | Who runs it | What it does |
 |---|---|---|
+| `review-agent-issue` | You, before an agent starts an issue | Posts the questions to settle first (with options and a recommendation), the assumptions the agent will otherwise follow, and exact edits to the issue; after you answer on the issue, writes your answers into its description. Advisory |
 | `review-agent-pr` | Any session, including the coding one | Reviews the PR, posts the code findings as one PR comment, and logs causes and proposals on a tracking issue |
 | `address-pr-review` | The agent that works on the PR | Fixes the findings marked "Fix now" and replies on the PR, finding by finding |
 | `improve-agent-process` | You, once several reviews are logged | Reads the tracking issue across reviews and opens one batched PR with the process changes worth making |
@@ -196,6 +198,23 @@ in place, which is skipped with a note when GraphQL is unavailable. If `gh` cann
 the repository from the git remote (for example, behind a proxy remote), set
 `GH_REPO=<owner>/<repo>`.
 
+**Prepare an issue (optional, advisory).** Before an agent starts an issue:
+
+> Use the review-agent-issue skill on issue 88.
+
+It posts one comment on the issue: questions worth settling before work starts (at most
+seven, each with options and a recommendation), the assumptions the agent will otherwise
+follow, and suggested edits to the issue. Answer on the issue with lines like
+`Decision r1/Q-1: (b)` or `Decision r1/E-1: accept`, then:
+
+> Use the review-agent-issue skill to apply the answers on issue 88.
+
+It writes your answers into a "Decisions and clarifications" section of the issue's
+description, makes the accepted edits, records what it did in a comment, and labels the
+issue `agent-ready` when nothing is left open. Your answers stay in the issue's comments
+for the record; the description is what the coding agent and the PR review read as the
+spec.
+
 **Review.** Start a new session, not the one that wrote the PR, and ideally a different
 tool or model:
 
@@ -283,6 +302,11 @@ skills/
     scripts/get-decisions.sh         lists the owner's Decision lines for a review (same as above)
     scripts/check-citations.sh       checks every file:line citation against the code
     scripts/check-outputs.sh         checks each reviewer's output has its required sections
+  review-agent-issue/
+    SKILL.md                         readiness review of an issue, and the apply step
+    analysts/                        spec analyst, codebase scout, readiness verifier
+    references/readiness-format.md   the comment's layout and rules
+    scripts/                         fetch the issue and earlier rounds, read answers, post, update the description
   address-pr-review/
     SKILL.md
     scripts/get-review.sh            prints the latest review report and whether the PR moved since

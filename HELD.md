@@ -14,3 +14,4 @@ Changes proposed in the meantime are listed here and made together after the win
 | 2026-10-04 | Cost per review (subagent tokens and time) recorded in the run metadata | Loop audit |
 | 2026-10-04 | Batch harness changes like project changes, with an ID and a target, and measure them the same way | Loop audit |
 | 2026-10-04 | An intake for process incidents that happen outside a PR (for example a scratch folder that held secrets) | Loop audit |
+| 2026-10-04 | review-agent-pr: count "escaped questions", spec guesses a PR review still finds on issues a readiness review marked ready, so improve-agent-process can measure what readiness misses | review-agent-issue design |
