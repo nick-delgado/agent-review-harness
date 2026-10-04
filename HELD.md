@@ -15,3 +15,5 @@ Changes proposed in the meantime are listed here and made together after the win
 | 2026-10-04 | Batch harness changes like project changes, with an ID and a target, and measure them the same way | Loop audit |
 | 2026-10-04 | An intake for process incidents that happen outside a PR (for example a scratch folder that held secrets) | Loop audit |
 | 2026-10-04 | review-agent-pr: count "escaped questions", spec guesses a PR review still finds on issues a readiness review marked ready, so improve-agent-process can measure what readiness misses | review-agent-issue design |
+| 2026-10-04 | review-agent-pr: list in the manifest the PRD and ADR changes on the base branch since the issue's readiness review and since the PR branched, so reviewers see when the spec moved under the work | Spec-drift design |
+| 2026-10-04 | review-agent-pr: a "spec moved" marker for findings caused by a spec change after work began: a question for the owner, not a spec deviation, and not counted as an agent mistake in measurements | Spec-drift design |

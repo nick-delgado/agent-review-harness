@@ -213,7 +213,17 @@ It writes your answers into a "Decisions and clarifications" section of the issu
 description, makes the accepted edits, records what it did in a comment, and labels the
 issue `agent-ready` when nothing is left open. Your answers stay in the issue's comments
 for the record; the description is what the coding agent and the PR review read as the
-spec.
+spec. Each answer records the commit of the spec it was settled against. The review also
+checks sibling issues, so two issues prepared in the same wave are not settled differently
+on the same behaviour.
+
+If a PRD or ADR amendment merges while issues are waiting, refresh them before their agents
+start:
+
+> Use the review-agent-issue skill to refresh the readiness of issue 88.
+
+It diffs the spec since the issue was settled, and posts only if something the issue relied
+on changed, with new questions where an answer no longer holds.
 
 **Review.** Start a new session, not the one that wrote the PR, and ideally a different
 tool or model:
