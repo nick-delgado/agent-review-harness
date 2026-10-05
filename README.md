@@ -354,9 +354,10 @@ until the window ends.
 
 ## Versioning
 
-Each skill's frontmatter carries `metadata.harness-version` (a date, `YYYY.MM.DD`, with a
-suffix for a second change on the same day). Reports and responses print it, so you can
-tell which version produced them. Bump it in every skill that changes.
+Every skill's frontmatter carries the same `metadata.harness-version`, the harness release
+(a date, `YYYY.MM.DD`, with a suffix for a second release on the same day). Reports and
+responses print it, so you can tell which release produced them. Any change bumps it in
+every skill, so all skills always show the release they came with.
 
 If a project commits copies of these skills (for example under `.agents/skills/`), those
 copies do not update themselves: refresh them with `npx skills update` or `install.sh`, or
