@@ -37,6 +37,9 @@ those cases before work starts, and only those: this is not a new review of the 
      It becomes a question, in the readiness format, with options and a recommendation.
 4. Check whether any acceptance criterion or owned path in the issue is now wrong (a
    renamed file, a changed requirement); propose an exact edit for it.
+5. For each deferral note posted on the issue since the last round (a comment starting
+   `<!-- agent-pr-review:deferred`), check that the issue's criteria and owned paths cover
+   the deferred work; where they do not, propose an exact edit adding it.
 
 ## Output: `<RUN_DIR>/readiness.md`
 

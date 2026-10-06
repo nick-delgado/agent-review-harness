@@ -12,7 +12,9 @@ find what a careful implementer would need to ask, and what would mislead one.
 
 Read the issue (`<RUN_DIR>/spec/issue-<n>.md`, with all its comments; later comments
 override earlier text) and the issues it links to. List the requirements as `R-1`, `R-2`,
-..., each a single statement with its exact quote. For each acceptance criterion, say
+..., each a single statement with its exact quote. A comment starting
+`<!-- agent-pr-review:deferred` records work the owner deferred to this issue from a PR
+review: each is a requirement too, with the note as its source. For each acceptance criterion, say
 whether it can be tested as written, and if not, why (no observable outcome, no threshold,
 "works correctly", two readings).
 

@@ -54,6 +54,7 @@ tracked_classes() {
     grep -oE '^\| `[a-z][a-z-]*`' "$here/../references/failure-classes.md" | grep -oE '[a-z][a-z-]*' | sort -u
   fi
   echo "other"
+  echo "spec-moved"
 }
 
 case "$stage" in
@@ -90,16 +91,20 @@ case "$stage" in
           if (!dn) print id ": needs owner decision, but no Decision needed field"
           if (opts < 2) print id ": needs owner decision, but fewer than two options (a), (b)"
           if (!rec) print id ": needs owner decision, but no Recommendation field"
+          if (defer && sev == "blocker") print id ": a blocker cannot be deferred to another issue"
+          if (defer && opts < 2) print id ": a Defer option cannot be the only option"
         } else if (act != "") {
           if (!fix) print id ": no Suggested fix field"
           if (!done) print id ": no Done when field"
         }
+        if (moved && act != "needs owner decision") print id ": Spec moved, so the action must be needs owner decision"
+        if (defer && act != "needs owner decision") print id ": a Defer option needs the action needs owner decision"
       }
       /^[ ]*```/ { fence = !fence }
       !fence && /^### / {
         check()
         id = $2; sub(/:$/, "", id)
-        sev = ""; act = ""; chg = ""; loc = 0; dn = 0; opts = 0; rec = 0; fix = 0; done = 0
+        sev = ""; act = ""; chg = ""; loc = 0; dn = 0; opts = 0; rec = 0; fix = 0; done = 0; moved = 0; defer = 0
         next
       }
       /^- \*\*Severity:\*\* / { sev = $0; sub(/^- \*\*Severity:\*\* */, "", sev); sub(/[ (].*/, "", sev) }
@@ -107,7 +112,8 @@ case "$stage" in
       /^- \*\*Changed since the last review:\*\* / { chg = $0; sub(/^- \*\*Changed since the last review:\*\* */, "", chg) }
       /^- \*\*Location:\*\*/ { loc = 1 }
       /^- \*\*Decision needed:\*\*/ { dn = 1 }
-      /^[ ]*- \([a-z]\) / { opts++ }
+      /^[ ]*- \([a-z]\) / { opts++; if ($0 ~ /^[ ]*- \([a-z]\) Defer to #[0-9]+/) defer = 1 }
+      /^- \*\*Spec moved:\*\*/ { moved = 1 }
       /^- \*\*Recommendation:\*\*/ { rec = 1 }
       /^- \*\*Suggested fix:\*\*/ { fix = 1 }
       /^- \*\*Done when:\*\*/ { done = 1 }

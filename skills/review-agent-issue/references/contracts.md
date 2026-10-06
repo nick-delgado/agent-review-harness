@@ -30,6 +30,7 @@ All files live in `RUN_DIR` (outside any checkout).
 |---|---|---|---|
 | Readiness review (one per round) | `post-readiness.sh` | `<!-- agent-pr-review:readiness round=<k> -->` | `post-readiness.sh` |
 | Apply record (one per apply) | `post-readiness.sh`, from `applied.md` | `<!-- agent-pr-review:readiness-applied round=<k> -->` | `post-readiness.sh` |
+| Deferral note (work deferred to this issue from a PR review) | `address-pr-review` | `<!-- agent-pr-review:deferred pr=<n> review=<commit> finding=<ID> -->` | its `post-deferral.sh`; read by the spec analyst and refresh mode |
 | Owner's answers | the owner | `Decision r<k>/<ID>: <answer>` lines, ID being `Q-<m>`, `A-<m>`, `E-<m>` or `ALL` | `get-issue-decisions.sh` |
 
 ## Changing a contract

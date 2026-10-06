@@ -207,8 +207,9 @@ settled a while ago:
    git -C "$RUN_DIR/worktree" diff <spec commit> HEAD -- <direction document paths> > "$RUN_DIR/spec-changes.patch"
    ```
 
-   If the patch is empty and no sibling issue's readiness answers changed since the last
-   round's date, stop: tell the user the issue is still ready, post nothing, and remove
+   If the patch is empty, no sibling issue's readiness answers changed since the last
+   round's date, and no deferral note (`<!-- agent-pr-review:deferred`) was posted on the
+   issue since then, stop: tell the user the issue is still ready, post nothing, and remove
    the worktree.
 3. **Manifest** as in review mode, adding `spec-changes.patch`, the last round's spec
    commit and this round's.

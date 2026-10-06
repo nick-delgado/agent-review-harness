@@ -112,7 +112,10 @@ re-spawn, as phase 4 says). In phase 4, re-spawn only the reviewers (or
      ```
 
    At the end of each phase append `phase-<k>=done`, and after posting append
-   `posted-process=<URL>` and `posted-report=<URLs>`. If posting the report fails partway,
+   `posted-process=<URL>` and `posted-report=<URLs>`. When a subagent finishes and your
+   runtime reports what it used (Claude Code's notification gives tokens and duration),
+   append `cost=<phase>:<subagent>:<tokens>:<seconds>`, writing `?` for what it does not
+   report; the assembly script totals them into the process findings' data line. If posting the report fails partway,
    record the parts that were posted and tell the user; do not post the whole report again.
 6. Check out the PR head without disturbing the user's working tree:
 
@@ -220,6 +223,21 @@ Whatever level supplied the task spec, also list repo-level goal documents (road
 architecture, ADRs) as *direction* sources: the spec-alignment reviewer checks the PR against
 the project's longer-term goals as well as the task.
 
+Then gather two sets of facts for the verifier:
+
+```sh
+<SKILL_DIR>/scripts/spec-moves.sh "$RUN_DIR" <base branch> <direction source paths>
+<SKILL_DIR>/scripts/related-issues.sh "$RUN_DIR" <the PR's own issue numbers>
+```
+
+The first writes `spec-moves.md` and `spec-moves.patch`: the readiness state of the PR's
+issues, and the commits that changed the direction documents on the base branch since the
+work began and since a readiness review settled the issue. A spec that moved under the
+work is a question for the owner, not the agent's mistake. The second writes
+`related-issues.md`: open issues that name files this PR changes or that its issues link
+to, with their acceptance criteria, owned paths and settled decisions, so the verifier's
+suggestions agree with upcoming work.
+
 ## Phase 3: Context manifest
 
 Write `RUN_DIR/manifest.md`. It is the single description of the review's inputs, and every
@@ -235,7 +253,9 @@ eight items below as its sections, headed `## 1. PR facts`, `## 2. Spec sources`
    the owner's decisions on earlier findings are part of the task spec: they are posted on
    the PR (`RUN_DIR/previous/decisions.md`) and recorded in the authoring agent's responses
    (`RUN_DIR/previous/responses.md`, the Decision column). Reviewers do not read those
-   files, so state each decision here in one line, named as `<commit>/<ID>`.
+   files, so state each decision here in one line, named as `<commit>/<ID>`. Copy the
+   "Readiness of the PR's issues" lines from `spec-moves.md`, and name `spec-moves.md`,
+   `spec-moves.patch` and `related-issues.md`, saying that only the verifier reads them.
 3. **Standards sources**: every document that tells a contributor how to build here.
    `AGENTS.md`, `CLAUDE.md`, `GEMINI.md` (root and nested ones on the path to any changed
    file), `CONTRIBUTING.md`, `README.md` sections on conventions, `docs/` pages on
