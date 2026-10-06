@@ -179,7 +179,7 @@ Clone this repository next to the project, then:
 | Codex | `.agents/skills/` | `~/.agents/skills/` |
 | Antigravity | `.agents/skills/` | `~/.gemini/config/skills/` |
 
-The installer copies all three skills. A user-level install keeps the harness out of the
+The installer copies all four skills. A user-level install keeps the harness out of the
 reviewed repository. A project install can be committed so the whole team, and the agents
 working in the repository, have it.
 
@@ -188,7 +188,7 @@ from `skills/` into any of the locations above by hand works too.
 
 ## Use
 
-Requirements for all three: `gh` installed and authenticated, and a working directory that
+Requirements for all four: `gh` installed and authenticated, and a working directory that
 is a clone of the repository.
 
 All GitHub access goes through the REST API (`gh api`), never GraphQL, so the skills also
@@ -205,12 +205,15 @@ the repository from the git remote (for example, behind a proxy remote), set
 It posts one comment on the issue: questions worth settling before work starts (at most
 seven, each with options and a recommendation), the assumptions the agent will otherwise
 follow, and suggested edits to the issue. Answer on the issue with lines like
-`Decision r1/Q-1: (b)` or `Decision r1/E-1: accept`, then:
+`Decision r1/Q-1: (b)` or `Decision r1/E-1: accept`. `Decision r1/ALL: accept` takes every
+recommendation and edit at once, but not the assumptions the comment lists under "Check
+these first" or marks "(verify first)": answer each of those with `ok` or a correction.
+Only `Decision` lines are applied, never replies in other words. Then:
 
 > Use the review-agent-issue skill to apply the answers on issue 88.
 
-It writes your answers into a "Decisions and clarifications" section of the issue's
-description, makes the accepted edits, records what it did in a comment, and labels the
+A script writes your answers into a "Decisions and clarifications" section of the issue's
+description and makes the accepted edits; it then records what it did in a comment, and labels the
 issue `agent-ready` when nothing is left open. Your answers stay in the issue's comments
 for the record; the description is what the coding agent and the PR review read as the
 spec. Each answer records the commit of the spec it was settled against. The review also
@@ -223,7 +226,8 @@ start:
 > Use the review-agent-issue skill to refresh the readiness of issue 88.
 
 It diffs the spec since the issue was settled, and posts only if something the issue relied
-on changed, with new questions where an answer no longer holds.
+on changed (or a PR review deferred work to it), with new questions where an answer no
+longer holds.
 
 **Review.** Start a new session, not the one that wrote the PR, and ideally a different
 tool or model:
@@ -231,7 +235,11 @@ tool or model:
 > Use the review-agent-pr skill to review PR 123.
 
 The review checks the PR out into a temporary git worktree and does not touch your working
-tree.
+tree. It also notes when the spec moved under the work (a PRD or ADR change merged after the
+work began or after the issue's readiness review): such a finding is a question for you,
+not counted as the agent's mistake. And it reads the open issues related to the PR, so its
+suggestions agree with upcoming work, and it may offer to defer a fix to an issue that
+already covers it (never a blocker or a fix the PR needs; you decide).
 
 **Review from the coding session.** You do not need a second session. Every judgement in
 the review (findings, verification, causes, the report's summary) is made by subagents
@@ -273,7 +281,9 @@ open a follow-up issue, or leave it. In an unattended run it leaves them undone 
 them first in its response. It corrects facts in any file, instruction files included, but
 never changes the rules agents follow: those go through `improve-agent-process`.
 It pushes fixes to the PR branch and replies on the PR with one row per finding: fixed,
-disputed, not fixed, or waiting for a decision. It then recommends what comes next, from the
+disputed, not fixed, deferred, or waiting for a decision. A fix you deferred to another
+issue is noted on that issue, so its readiness review and its agent see it. It never edits
+or deletes a comment; corrections go in its next response. It then recommends what comes next, from the
 verdict and the size of the change: nothing, a re-check, or a full review.
 
 **Re-check.** After fixes, a re-check is usually enough and costs about a fifth of a full
@@ -291,6 +301,14 @@ and changes merged in from the base branch do not count).
 > Use the improve-agent-process skill.
 
 It shows you what it would change, defer and drop, and opens the PR only after you choose.
+
+**Log an incident.** For a process failure that no PR shows (secrets left in a scratch
+folder, a push to the wrong branch):
+
+> Use the improve-agent-process skill to log an incident: <what happened>.
+
+It posts the incident on the tracking issue, and the next batch weighs it like review
+findings.
 
 ## Layout
 
@@ -312,20 +330,28 @@ skills/
     scripts/get-decisions.sh         lists the owner's Decision lines for a review (same as above)
     scripts/check-citations.sh       checks every file:line citation against the code
     scripts/check-outputs.sh         checks each reviewer's output has its required sections
+    scripts/validate.sh              checks every hand-off against references/contracts.md
+    scripts/spec-moves.sh            direction-document changes since the work began and since readiness
+    scripts/related-issues.sh        open issues that name the PR's files or are linked from its issues
   review-agent-issue/
     SKILL.md                         readiness review of an issue, and the apply step
-    analysts/                        spec analyst, codebase scout, readiness verifier
+    analysts/                        spec analyst, codebase scout, readiness verifier, refresh analyst
     references/readiness-format.md   the comment's layout and rules
-    scripts/                         fetch the issue and earlier rounds, read answers, post, update the description
+    references/contracts.md          every exchanged file and its check
+    scripts/apply-readiness.sh       builds the new description from the Decision lines
+    scripts/validate.sh              checks every hand-off
+    scripts/                         also: fetch the issue and earlier rounds, read answers, post, update the description
   address-pr-review/
     SKILL.md
     scripts/get-review.sh            prints the latest review report and whether the PR moved since
     scripts/get-reports.sh           (same as above)
     scripts/get-decisions.sh         lists the owner's Decision lines for a review
     scripts/post-response.sh         posts the response as a new PR comment
+    scripts/post-deferral.sh         notes a deferred finding on its target issue
   improve-agent-process/
     SKILL.md
-    scripts/get-process-log.sh       prints the tracking issue and its comments
+    references/harness-changes.md    the harness's own changes, with IDs and targets, to measure
+    scripts/get-process-log.sh       prints the tracking issue, responses, reviewer signals and deferrals
 install.sh
 ```
 
@@ -349,8 +375,15 @@ makes has an ID and a target class. `improve-agent-process` starts by measuring 
 earlier change against PRs begun after it merged, and a change of words that failed is
 followed by a guardrail or a removal, not by more words.
 
-While a project measures, the reviewer is held steady: see `HELD.md` for changes waiting
-until the window ends.
+The harness is measured the same way. Its own changes are listed with IDs and targets in
+`skills/improve-agent-process/references/harness-changes.md`, and measured by the harness
+version on each data line. Each batch also reports the reviewer's quality (findings the
+verifier rejected, recommendations the owner overrode, disputes a later round upheld,
+defects a suggested fix introduced), the questions readiness reviews missed, how often the
+spec moved under work, and the cost per review where the runtime reports it.
+
+While a project measures, hold the reviewer steady: queue harness changes in `HELD.md` and
+make them together when the window ends.
 
 ## Versioning
 
@@ -363,8 +396,21 @@ If a project commits copies of these skills (for example under `.agents/skills/`
 copies do not update themselves: refresh them with `npx skills update` or `install.sh`, or
 keep the skills out of the project and install them per user.
 
+## Contributing: the generality check
+
+The harness is meant for any project, but most of its evidence comes from one. So every
+change passes one check: **mechanics in the harness, content in the project.** How reviews
+and readiness reviews run, the exchange contracts, the decision format, measurement and
+the default failure classes belong here. What agents must do in a particular project
+(journal entries, ADR tests, task templates, mutation testing) belongs in that project,
+written there by `improve-agent-process`; the harness at most offers a hook for it. Ask of
+each change: would a project in another language, with another workflow and templates,
+need it? Record the answer in the commit message. When a change could move a count, add
+it to `harness-changes.md` with a target, and when a file's format changes, change its
+producer, its contract and its check together.
+
 ## Status
 
-In use on one project. All three skills have run on real PRs, in Claude Code (locally and
+In use on one project. All four skills have run on real PRs or issues, in Claude Code (locally and
 in cloud sessions) and in Antigravity; Codex has not been tried. The harness changes often:
 check `metadata.harness-version` in a report or response to see which version produced it.
