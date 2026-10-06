@@ -47,7 +47,21 @@ case "$stage" in
     for f in spec code; do
       [ -s "$run/analysis/$f.md" ] || problem "analysis/$f.md is missing or empty"
     done
-    [ -s "$run/analysis/spec.md" ] && need "$run/analysis/spec.md" "## Requirements" "## Open behaviour" "## Conflicts" "## Stale references" "## Scope" "## Not checked"
+    [ -s "$run/analysis/spec.md" ] && need "$run/analysis/spec.md" "## Requirements" "## Open behaviour" "## Conflicts" "## Stale references" "## Scope" "## Sources read" "## Not checked"
+    # Every spec file read to its last line: long files come back from a read cut short.
+    if [ -s "$run/analysis/spec.md" ]; then
+      for s in "$run"/spec/*.md; do
+        [ -f "$s" ] || continue
+        rel="spec/$(basename "$s")"; lines="$(awk 'END { print NR }' "$s")"
+        row="$(awk '/^## Sources read/ { on = 1; next } on && /^## / { exit } on' "$run/analysis/spec.md" | grep -F "$rel" | head -n 1 || true)"
+        to="$(printf '%s' "$row" | sed -n 's/.*read to line \([0-9][0-9]*\) of \([0-9][0-9]*\).*/\1 \2/p')"
+        if [ -z "$to" ]; then
+          problem "spec.md: list $rel under Sources read as \"(read to line $lines of $lines)\", after reading it to its end"
+        elif [ "$to" != "$lines $lines" ]; then
+          problem "spec.md: $rel was read to line ${to% *} of ${to#* }, but it has $lines lines: read the rest from the file itself, in line ranges"
+        fi
+      done
+    fi
     [ -s "$run/analysis/code.md" ] && need "$run/analysis/code.md" "## Map" "## Owned paths" "## Reuse" "## Lines made stale" "## Searches run" "## Dependencies and overlaps" "## Sibling issues" "## Size" "## Risks" "## Not checked"
     finish
     ;;
