@@ -11,6 +11,8 @@ Changes proposed in the meantime are listed here and made together after the win
 | Proposed | Change | Source |
 |---|---|---|
 | 2026-10-06 | **First in the release.** An explicit, enforced exchange contract between the orchestrators, their subagents and the scripts (see "Exchange contract" below) | Owner request |
+| 2026-10-06 | A generality check for every harness change, applied to this release first (see "Generality check" below) | Owner request |
+| 2026-10-06 | Reword three passages that lean on serverless-ai-scheduling's conventions (see "Rewordings for generality" below) | Owner request |
 | 2026-10-04 | Reviewer-quality signals in each batch: findings the verifier rejected, owner decisions that overrode a recommendation, findings the fixing agent disputed, defects introduced by a suggested fix, and findings a later round found in code an earlier round passed | Loop audit, recommendation 4 |
 | 2026-10-04 | Cost per review (subagent tokens and time) recorded in the run metadata | Loop audit |
 | 2026-10-04 | Batch harness changes like project changes, with an ID and a target, and measure them the same way | Loop audit |
@@ -103,4 +105,39 @@ audit it), and enforce it at every hand-off:
    (findings with severity, action, failure class, location, changed-or-unchanged code,
    harness version), for `improve-agent-process` to count from. This also covers the
    "machine-readable block per round" idea from the loop audit.
+
+## Generality check
+
+Agreed on 2026-10-06. The harness is meant for any project, but its evidence so far comes
+from one (serverless-ai-scheduling), so changes risk fitting that project's conventions.
+
+**The line:** mechanics in the harness, content in the project.
+
+- **Harness:** how reviews and readiness reviews run, the exchange contract, the decision
+  format, measurement and the default failure classes, syncing and re-checks, cost.
+- **Project:** what agents must do in that project (journal entries, ADR tests, task
+  templates, evidence lists, mutation testing). `improve-agent-process` writes this content
+  into the project; the harness at most offers a hook for it.
+
+**The check,** for every harness change, including each item of this release and every
+suggestion that arrives under "harness changes for the maintainers": would a project in a
+different language, with a different workflow and templates, need this? If it depends on
+one project's conventions, send it back to that project through `improve-agent-process`,
+or reduce the harness change to a hook the project fills in.
+
+In the release: run the check over every item before building it, record the result in the
+commit message, and add the check to the README's notes for contributors.
+
+The real test is a second project: once the harness settles, try it on a different kind of
+codebase to find what is still tailored to the first.
+
+## Rewordings for generality
+
+To ship in the release, after the generality check.
+
+| Skill and passage | Leans on | Generic wording |
+|---|---|---|
+| `address-pr-review`, step 3: "If you change a test that a recorded break cites (in the PR description's evidence, a journal entry or an earlier response), redo that break" | the project's "seen failing" evidence practice | "Where the project records evidence that a test can fail, keep that evidence true when you change the test." |
+| `review-agent-issue`, readiness format: "A criterion that only a browser or a person can check gets an edit to the issue's Verification section" | the project's issue template having a Verification section | "Route a criterion a test cannot check to wherever the project records manual verification (a section of the issue template, the PR template, or the PR description)." |
+| Decisions recorded "in a journal entry, an ADR, a changelog line" (`address-pr-review`) | already phrased as "where the project's own rules ask" | No change; re-check it under the generality check. |
 
