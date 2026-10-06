@@ -77,7 +77,7 @@ case "$stage" in
     while IFS= read -r l; do [ -n "$l" ] && problem "readiness.md: $l"; done < "$run/.validate-q"
     rm -f "$run/.validate-q"
     # Assumption rows: an ID, a basis, a Makes stale cell.
-    awk -F'|' '/^\| A-[0-9]+ \|/ { if (NF < 7) print $2 ": assumption row needs ID, Assumption, Basis, Makes stale and To correct" }' "$f" > "$run/.validate-a" || true
+    awk '/^\| A-[0-9]+ \|/ { l = $0; gsub(/\\\|/, "", l); n = split(l, c, "|"); id = c[2]; gsub(/^[ \t]+|[ \t]+$/, "", id); if (n != 7) print id ": assumption row needs exactly ID, Assumption, Basis, Makes stale and To correct (write a pipe inside a cell as \\|)" }' "$f" > "$run/.validate-a" || true
     while IFS= read -r l; do [ -n "$l" ] && problem "readiness.md: $l"; done < "$run/.validate-a"
     rm -f "$run/.validate-a"
     # "Like X" pointers are not allowed: reuse says import, move and share, or ask.
