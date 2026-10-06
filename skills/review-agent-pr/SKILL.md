@@ -50,6 +50,11 @@ it to an absolute path once and use absolute paths whenever you hand a path to a
   foreground command: that ties up the session the user may be working in. Between
   notifications, answer the user as usual; keep this review's run directory and PR straight
   if other work is going on in the same session.
+- **Every hand-off is checked.** Each file that passes between you, a subagent and a script
+  has a contract (`references/contracts.md`), and `scripts/validate.sh` checks it before the
+  next step uses it. A file that fails goes back to whoever wrote it, with the script's
+  output; never repair a subagent's file yourself, and never let a step read a file that
+  failed.
 - **Absolute paths only.** Every path you give a subagent is absolute, and every file the
   review writes is under `RUN_DIR`. A relative path is read against whatever directory the
   subagent happens to be in, which is usually the user's checkout.
@@ -85,7 +90,9 @@ it to an absolute path once and use absolute paths whenever you hand a path to a
    mode (full review or re-check) and every phase it finished. A session can lose its place
    (an interruption, its context compacted), and a review is long, so pick up where it
    stopped rather than start again:
-   - **Same PR, same head commit, same mode, and phase 7 not finished:** resume. Recreate
+   - **Same PR, same head commit, same mode, same harness version, and phase 7 not
+     finished:** resume. (A run started under another harness version starts clean: its
+     files may follow an older contract.) Recreate
      the worktree if it is gone, read the manifest and the outputs already written, and
      continue from the first unfinished phase (move aside the output file of any subagent you
 re-spawn, as phase 4 says). In phase 4, re-spawn only the reviewers (or
@@ -100,6 +107,7 @@ re-spawn, as phase 4 says). In phase 4, re-spawn only the reviewers (or
      pr=<n>
      head=<full head sha>
      mode=<full | re-check>
+     harness=<metadata.harness-version of this skill>
      started=<UTC time>
      ```
 
@@ -215,7 +223,10 @@ the project's longer-term goals as well as the task.
 ## Phase 3: Context manifest
 
 Write `RUN_DIR/manifest.md`. It is the single description of the review's inputs, and every
-subagent reads it. List paths and one-line descriptions; do not paste file contents.
+subagent reads it. List paths and one-line descriptions; do not paste file contents. Use the
+eight items below as its sections, headed `## 1. PR facts`, `## 2. Spec sources`, and so on
+(write "none" under an item with nothing in it), then check it:
+`<SKILL_DIR>/scripts/validate.sh "$RUN_DIR" manifest`.
 
 1. **PR facts**: number, title, URL, base and head SHAs, size, CI state, changed files
    grouped by area.
@@ -330,7 +341,7 @@ the order above, writing each output file before starting the next. Record
 When the reviewers finish, check their outputs:
 
 ```sh
-<SKILL_DIR>/scripts/check-outputs.sh "$RUN_DIR"
+<SKILL_DIR>/scripts/validate.sh "$RUN_DIR" reviewers
 ```
 
 It lists any reviewer (or part) whose output is missing or lacks a required section,
@@ -351,15 +362,19 @@ findings files, tries to refute each finding against the code, spot-checks a sam
 checks the reviewers passed, and, on a re-review, settles what became of each previous
 finding.
 
-Then check every line citation against the code:
+Then check the verifier's output against its contract:
 
 ```sh
-<SKILL_DIR>/scripts/check-citations.sh "$RUN_DIR" "$RUN_DIR/verified.md"
+<SKILL_DIR>/scripts/validate.sh "$RUN_DIR" verified
 ```
 
-If it reports invalid citations, send the list back to the verifier (or spawn a fresh one
-with the list) to correct them, and run the check again. Record the final line of its
-summary in the run metadata.
+It checks every confirmed finding for the fields the report and the fixing agent depend on
+(severity, action, location; options and a recommendation for a decision; a suggested fix
+and "done when" otherwise; "changed since the last review" on a re-review), the minor
+table's actions, and that every `file:line` citation resolves to a line of a file at the PR
+head (full paths: a short path that cannot be resolved fails). If it reports problems, send
+them back to the verifier (or a fresh one with the list), and run it again. Record the
+citation summary line in the run metadata.
 
 Only findings in the confirmed list go forward. The rejected list is published in the report.
 
@@ -371,6 +386,10 @@ process inventory and writes `RUN_DIR/root-cause.md`: what in the project's docs
 prompts, specs, precedents or guardrails most plausibly led the agent to each finding, and
 a set of concrete improvement proposals. Depth follows severity: blockers and majors get a
 full analysis, minors a one-line cause that feeds the patterns, nits none.
+
+Check its output: `<SKILL_DIR>/scripts/validate.sh "$RUN_DIR" root-cause` (sections, and
+a valid severity and tracked failure class on every row of the cause summary). Send
+problems back to the analyst.
 
 Only the PR is available, not the agent's prompt or transcript, so every cause is an
 inference. The brief requires each one to be labelled with its confidence and supporting
