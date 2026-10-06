@@ -24,6 +24,11 @@ behaviour, what happens to existing data or callers, defaults, ordering, time zo
 do what. For each, give the readings a reasonable implementer could take and what each
 would mean for the code and its users. Do not choose.
 
+Mark **Design needed** where the work must produce a design the issue does not give: sample
+or fixture data, how two flags or modes interact, where a matcher's boundaries lie or how
+far a negation reaches, the rules that recognise or classify an input. An agent left to
+invent these invents them differently from what the owner had in mind.
+
 ### 3. Conflicts and settled answers
 
 Check each requirement against the direction sources in the manifest (PRD, ADRs,
@@ -59,6 +64,7 @@ searching the code for the names it uses. Quote each stale reference and what re
 ## Open behaviour
 ### OB-1: <the open point>
 - **Requirement:** R-<n>
+- **Design needed:** yes | no
 - **Readings:** (a) ... — consequence; (b) ... — consequence
 - **Settled by:** <quote and location, or "nothing found">
 
