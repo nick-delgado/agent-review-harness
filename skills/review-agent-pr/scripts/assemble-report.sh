@@ -283,9 +283,14 @@ readiness_state() {
 cost_state() {
   grep '^cost=' "$run/progress.txt" 2>/dev/null | awk -F: '
     { n++; if ($3 ~ /^[0-9]+$/) tok += $3; else tu = 1; if ($4 ~ /^[0-9]+$/) sec += $4; else su = 1 }
+    { ph = $1; sub(/^cost=/, "", ph); if ($3 ~ /^[0-9]+$/) pt[ph] += $3; if (!(ph in seen)) { seen[ph] = 1; order[++np] = ph } }
     END {
       if (n == 0) { print "not reported"; exit }
-      printf "%s tokens, %s min in %d subagents\n", (tu ? "≥" : "") tok, (su ? "≥" : "") int(sec / 60 + 0.5), n
+      printf "%s tokens, %s min in %d subagents", (tu ? "≥" : "") tok, (su ? "≥" : "") int(sec / 60 + 0.5), n
+      # By phase, so a batch can see which phase a cost change came from.
+      printf " (by phase:"
+      for (i = 1; i <= np; i++) printf "%s %s %dk", (i > 1 ? "," : ""), order[i], int(pt[order[i]] / 1000 + 0.5)
+      printf ")\n"
     }' | grep . || echo "not reported"
 }
 
@@ -298,10 +303,11 @@ write_findings_json() {
   version="$(sed -n 's/^  harness-version: "\(.*\)"$/\1/p' "$(dirname "$0")/../SKILL.md" | head -n 1)"
   lines="$({ grep -o '"additions":[0-9]*' "$run/pr.json" | head -n 1; grep -o '"deletions":[0-9]*' "$run/pr.json" | head -n 1; } 2>/dev/null | cut -d: -f2 | awk '{ s += $1 } END { print s + 0 }')"
   {
-    h2 "$rootcause" "Cause summary" 2>/dev/null | awk -F'|' '{ gsub(/\\\|/, "\034") } /^\| *[A-Z]+-[0-9]/ {
+    # No root-cause.md when phase 6 was skipped (no findings above nit): no classes, no causes.
+    [ -s "$rootcause" ] && h2 "$rootcause" "Cause summary" | awk -F'|' '{ gsub(/\\\|/, "\034") } /^\| *[A-Z]+-[0-9]/ {
       id = $2; gsub(/^[ \t]+|[ \t]+$/, "", id); sub(/[ (].*/, "", id)
       cls = $4; gsub(/[ \t`]/, "", cls); cause = $5; gsub(/`/, "", cause); gsub(/^[ \t]+|[ \t]+$/, "", cause); gsub(/\034/, "|", cause)
-      print "CLASS\t" id "\t" cls "\t" cause }'
+      print "CLASS\t" id "\t" cls "\t" cause }' || true
     h2 "$verified" "Confirmed findings" | sed 's/^/BODY\t/'
   } | awk -F'\t' -v pr="${pr_number:-}" -v sha="$report_sha" -v round="$round" -v version="$version" -v lines="${lines:-0}" -v readiness="$readiness" '
     function esc(s) { gsub(/\\/, "\\\\", s); gsub(/"/, "\\\"", s); gsub(/\t/, " ", s); return s }
