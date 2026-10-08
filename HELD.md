@@ -8,11 +8,12 @@ some stricter and some more lenient).
 
 ## Queue
 
-Nothing is held. Add a row when a measurement window starts and a change is proposed during
-it.
+Add a row when a measurement window starts and a change is proposed during it, or when the
+owner wants a change designed now and built later.
 
 | Proposed | Change | Source |
 |---|---|---|
+| 2026-10-08 | **Comparison mode** for `review-agent-pr`, to build when model comparisons start: a full review that posts nothing (no report, no process comment) and keeps everything in its own labelled run directory, so `address-pr-review` never takes it for the real review; plus a script that lines up two runs' findings by location and title, and shows what each found that the other did not, with severities, cost and time from their `run.json`. Builds on the run record of `2026.10.08.1` | Owner, deferred until ready to compare |
 
 ## Released
 
