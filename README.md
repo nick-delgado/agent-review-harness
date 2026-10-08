@@ -382,6 +382,12 @@ verifier rejected, recommendations the owner overrode, disputes a later round up
 defects a suggested fix introduced), the questions readiness reviews missed, how often the
 spec moved under work, and the cost per review where the runtime reports it.
 
+Every review round records what ran: the orchestrator's and each subagent's model, effort
+level, tokens and time, as a table in the report's run metadata and a machine-readable run
+line, so cost can be totalled per round and per PR. To compare models, ask for one ("review
+PR 123 with the reviewers on Sonnet, label it sonnet-trial"): the run records the choice
+and its label, and measurements keep labelled runs apart.
+
 While a project measures, hold the reviewer steady: queue harness changes in `HELD.md` and
 make them together when the window ends.
 

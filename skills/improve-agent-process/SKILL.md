@@ -2,7 +2,7 @@
 name: improve-agent-process
 description: Turn the findings of several agent PR reviews into one batched pull request that improves the project's agent setup. Reads the tracking issue where the review-agent-pr skill logs why agents produced each finding, counts which causes recur across reviews, selects the proposed changes to docs, skills, prompts, tests and CI checks that are worth making, checks them against the current code, and opens a single PR after the user approves the selection. Also measures whether earlier changes, the project's and the review harness's, worked, and checks the reviewer's own quality. Use when asked to improve, update or fix the agent process, instructions or skills from review findings, to act on the agent process tracking issue, or to log a process incident that happened outside a PR.
 metadata:
-  harness-version: "2026.10.08"
+  harness-version: "2026.10.08.1"
 ---
 
 # Improve the agent process from review findings
@@ -142,9 +142,12 @@ Also count, over first reviews:
   should have asked. Read the issue's readiness comment for each and note whether it was
   an assumption the owner accepted, a point it never raised, or a question answered
   differently.
-- **Cost:** tokens and minutes per review (the data line's `Cost:`), by harness version
-  and by phase (the data line's "by phase" list), where reported. Say which phase moved
-  before attributing a change in cost to a harness change.
+- **Cost:** from the `run:` records in the log (one per review round, re-checks included;
+  for older rounds, the data line's `Cost:`): tokens and minutes per round, per PR (all its
+  rounds), by phase, by harness version, and by model and effort where recorded. Say which
+  phase moved before attributing a change in cost to a harness change. Compare models only
+  between runs of the same harness version, and treat runs with a `label` (comparison
+  runs) apart from the usual ones.
 
 Show the measurement tables to the user in step 9 and record them in step 11.
 
