@@ -1,0 +1,3 @@
+root-cause.md: cause summary row " STD-1 ": failure class "convention" is not in the tracked list
+root-cause.md: cause summary row " STD-2 ": Severity must be blocker, major or minor (got "nit")
+exit: 1

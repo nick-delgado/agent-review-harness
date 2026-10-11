@@ -1,0 +1,74 @@
+[
+  {
+    "filename": "apps/web/README.md",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1
+  },
+  {
+    "filename": "apps/web/package.json",
+    "status": "modified",
+    "additions": 2,
+    "deletions": 1
+  },
+  {
+    "filename": "apps/web/src/chat/ChatPage.errors.test.tsx",
+    "status": "modified",
+    "additions": 6,
+    "deletions": 2
+  },
+  {
+    "filename": "apps/web/src/chat/testUtils.ts",
+    "status": "modified",
+    "additions": 2,
+    "deletions": 2
+  },
+  {
+    "filename": "apps/web/src/chat/useChat.test.tsx",
+    "status": "modified",
+    "additions": 8,
+    "deletions": 2
+  },
+  {
+    "filename": "apps/web/src/mocks/node.test.ts",
+    "status": "added",
+    "additions": 163,
+    "deletions": 0
+  },
+  {
+    "filename": "apps/web/src/mocks/node.ts",
+    "status": "modified",
+    "additions": 32,
+    "deletions": 0
+  },
+  {
+    "filename": "apps/web/src/test/setup.ts",
+    "status": "modified",
+    "additions": 8,
+    "deletions": 3
+  },
+  {
+    "filename": "docs/journal/2026-10-06-the-web-tests-wait-by-hops-not-seconds.md",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1
+  },
+  {
+    "filename": "docs/journal/2026-10-07-the-closed-socket-was-a-passthrough.md",
+    "status": "added",
+    "additions": 52,
+    "deletions": 0
+  },
+  {
+    "filename": "docs/journal/README.md",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 0
+  },
+  {
+    "filename": "package-lock.json",
+    "status": "modified",
+    "additions": 2,
+    "deletions": 1
+  }
+]

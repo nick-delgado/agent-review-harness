@@ -1,0 +1,24 @@
+[
+ {
+  "id": 1,
+  "html_url": "https://github.test/c/1",
+  "created_at": "2026-10-08T12:00:00Z",
+  "updated_at": "2026-10-08T12:00:00Z",
+  "author_association": "OWNER",
+  "user": {
+   "login": "owner"
+  },
+  "body": "<!-- agent-pr-review:readiness round=1 -->\n## Readiness review (round 1): Needs answers\n\nRound: 1 \u00b7 Questions: 2 \u00b7 Assumptions: 3 \u00b7 Suggested edits: 2 \u00b7 Spec commit: abcdef1234567890 \u00b7 Harness version: 2026.10.06\n\n**Check these first:** A-2\n\n### Questions\n\n#### Q-1: Should a retry reuse the conversation?\n\n- **Options:**\n  - (a) Reuse it: the first-turn retry continues. Scope: within the issue\n  - (b) Start a new one and move the shared helper. Scope: adds files. Owned paths: + `packages/agent/src/retry.ts`\n- **Recommendation:** (b), because the PRD says so.\n- **Reply:** `Decision r1/Q-1: (b)`\n\n#### Q-2: What about a 4xx?\n\n- **Options:**\n  - (a) No retry. Scope: within the issue\n  - (b) Retry once. Scope: within the issue\n- **Recommendation:** (a), because errors are final.\n\n### Assumptions\n\n| ID | Assumption | Basis | Makes stale | To correct |\n|---|---|---|---|---|\n| A-1 | The button reads \"Retry\". | UI copy | nothing | `Decision r1/A-1: ...` |\n| A-2 | The SDK returns status on truncation (verify first) | docs | nothing | x |\n| A-3 | Retries are logged. | convention | nothing | x |\n\n### Suggested edits to the issue\n\n#### E-1: make the criterion testable\n\nBefore:\n```text\n- Retry works.\n```\nAfter:\n```text\n- When a 5xx arrives without an event, a Retry button is shown and resends the last message.\n```\n\n#### E-2: stale verification\n\nBefore:\n```text\n- npm run e2e\n```\nAfter:\n```text\n- npm test -w web\n```\n"
+ },
+ {
+  "id": 2,
+  "html_url": "https://github.test/c/2",
+  "created_at": "2026-10-08T12:02:00Z",
+  "updated_at": "2026-10-08T12:02:00Z",
+  "author_association": "OWNER",
+  "user": {
+   "login": "owner"
+  },
+  "body": "Decision r1/Q-1: (a)\nDecision r1/E-1: accept"
+ }
+]

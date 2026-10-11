@@ -1,0 +1,92 @@
+[
+  {
+    "sha": "0ff92ab75fa9bf76b975a6a9788b4203bb3d230f",
+    "commit": {
+      "message": "feat(evals): also write each run's results outside the checkout (#195)\n\nEvery live run that finishes writes its .json/.md pair to --out and then to\n$XDG_STATE_HOME/serverless-ai-scheduling/eval-results/<checkout>/ (or\n~/.local/state/...), overridable with EVAL_RESULTS_COPY_DIR. A copy directory\ninside the repository is a usage error; the directory is created before the\nfirst model call; a failed copy write warns without changing the exit code.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01E9XgjhqxuFbLZgmmAx6g66",
+      "author": {
+        "date": "2026-10-06T22:24:13Z"
+      }
+    }
+  },
+  {
+    "sha": "0b213f9c024bce58420e0cca6906f927cf2b90b8",
+    "commit": {
+      "message": "chore(evals): keep the checkout path inside the entry point's ignored wiring (#195)\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01E9XgjhqxuFbLZgmmAx6g66",
+      "author": {
+        "date": "2026-10-06T22:25:04Z"
+      }
+    }
+  },
+  {
+    "sha": "dce594b41ecb0f8dd5fc340ef4cdf46f86ae88b4",
+    "commit": {
+      "message": "test(evals): break every results-copy rule, drop the path calls no test could tell apart (#195)\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01E9XgjhqxuFbLZgmmAx6g66",
+      "author": {
+        "date": "2026-10-06T22:29:14Z"
+      }
+    }
+  },
+  {
+    "sha": "c516906f33d9ead12ca46fdbf909035f4109e22d",
+    "commit": {
+      "message": "docs(journal): record the mutation pass's two survivors (#195)\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01E9XgjhqxuFbLZgmmAx6g66",
+      "author": {
+        "date": "2026-10-06T22:30:01Z"
+      }
+    }
+  },
+  {
+    "sha": "d43a8818e53f6dd4d60c95f6f6e3a1d89898e58c",
+    "commit": {
+      "message": "docs(journal): link PR #200 (#195)\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01E9XgjhqxuFbLZgmmAx6g66",
+      "author": {
+        "date": "2026-10-06T22:30:30Z"
+      }
+    }
+  },
+  {
+    "sha": "e33643a1e0a5790e7006d0857a99b56bb36ae599",
+    "commit": {
+      "message": "fix(evals): refuse a copy directory whose per-checkout subdirectory is in the checkout (#195)\n\nd43a881/SPEC-1: the containment check tested the base, so EVAL_RESULTS_COPY_DIR set\nto the main checkout's parent wrote results into the repository root. It now tests\nthe directory the files go to and names it; a worktree's copy with the same\noverride still lands beside the checkout.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01E9XgjhqxuFbLZgmmAx6g66",
+      "author": {
+        "date": "2026-10-07T00:18:28Z"
+      }
+    }
+  },
+  {
+    "sha": "034146b392b663c1a5811113241bda6202afa006",
+    "commit": {
+      "message": "refactor(evals): one real-file adapter, a copy-status union, dry-run gate and warning in tested code (#195)\n\n- d43a881/SMELL-1: nodeFileWrites in cli-args.ts serves both fileCalibrationDeps\n  and the results writes; results-copy.ts's own adapter is gone.\n- d43a881/SMELL-4: WrittenResults.copy is same | written | failed, so an error\n  without a copy path doesn't typecheck.\n- d43a881/TEST-1, owner's decision (b): prepareResultsCopyDir takes the run's\n  dryRun and creates nothing for a dry run; resultsWrittenLine takes a required\n  warn callback and calls it from the failed case. Tests for both.\n- d43a881/TEST-2: the describe no longer says \"temp directory\" over the\n  fake-file tests; the temp-directory tests say so in their names.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01E9XgjhqxuFbLZgmmAx6g66",
+      "author": {
+        "date": "2026-10-07T00:19:28Z"
+      }
+    }
+  },
+  {
+    "sha": "e35261ccf08042bfc8e31006da983b5147c24258",
+    "commit": {
+      "message": "docs(evals): say the XDG default applies when XDG_STATE_HOME isn't absolute (#195)\n\nd43a881/STD-2: CLAUDE.md:74's ${XDG_STATE_HOME:-...} implied a relative value is\nused; it and cli.ts's header now state the absolute-path rule.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01E9XgjhqxuFbLZgmmAx6g66",
+      "author": {
+        "date": "2026-10-07T00:19:36Z"
+      }
+    }
+  },
+  {
+    "sha": "1cc72702878f57e9faf5be042182f8dd11304f08",
+    "commit": {
+      "message": "docs(journal): record the review's containment hole and Nick's decisions (#195)\n\nd43a881/SPEC-1, and the owner's decisions SPEC-2 (a), SPEC-3 (a), TEST-1 (b).\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01E9XgjhqxuFbLZgmmAx6g66",
+      "author": {
+        "date": "2026-10-07T00:24:54Z"
+      }
+    }
+  },
+  {
+    "sha": "85bd1ceb2924139d38056ec98995d33ba187b966",
+    "commit": {
+      "message": "docs(journal): credit Nick with the TEST-1 decision and the agent with the move (#195)\n\nFixes review finding 1cc7270/VER-1.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01E9XgjhqxuFbLZgmmAx6g66",
+      "author": {
+        "date": "2026-10-07T00:52:25Z"
+      }
+    }
+  }
+]

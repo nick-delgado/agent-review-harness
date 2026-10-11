@@ -1,0 +1,41 @@
+[
+ {
+  "number": 21,
+  "html_url": "https://github.test/issues/21",
+  "title": "Backoff",
+  "body": "## Acceptance criteria\n- [ ] retries back off\n\n## Owned paths\n- `packages/agent/src/`\n\n## Decisions and clarifications\n- **r1/Q-1**: no retry on 4xx\n"
+ },
+ {
+  "number": 22,
+  "html_url": "https://github.test/issues/22",
+  "title": "Other",
+  "body": "Unrelated body mentioning src/other.ts\n"
+ },
+ {
+  "number": 30,
+  "html_url": "https://github.test/issues/30",
+  "title": "PRD update",
+  "body": "## Acceptance criteria\n- edits docs/PRD.md section 3\n"
+ },
+ {
+  "number": 19,
+  "html_url": "https://github.test/issues/19",
+  "title": "Own issue",
+  "body": "names packages/agent/src/retry.ts\n"
+ },
+ {
+  "number": 40,
+  "html_url": "https://github.test/issues/40",
+  "title": "A pull request",
+  "body": "touches `docs/PRD.md`",
+  "pull_request": {
+   "url": "x"
+  }
+ },
+ {
+  "number": 41,
+  "html_url": "https://github.test/issues/41",
+  "title": "Unrelated",
+  "body": "nothing here\n"
+ }
+]

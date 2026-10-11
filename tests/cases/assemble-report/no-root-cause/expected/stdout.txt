@@ -1,0 +1,2 @@
+whole report: <CASE>/report.md (<n> characters)
+exit: 0

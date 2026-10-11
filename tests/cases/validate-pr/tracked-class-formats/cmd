@@ -1,0 +1,2 @@
+# Tables, bold, lists and backticks in section 8 all count; spec-moved and other always do.
+"$SKILLS/review-agent-pr/scripts/validate.sh" . root-cause

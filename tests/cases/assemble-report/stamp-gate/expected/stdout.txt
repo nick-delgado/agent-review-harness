@@ -1,0 +1,13 @@
+1 verified.md never validated:
+error: verified.md has not passed 'validate.sh <run> verified' in its current form; run it, send any problems back to the subagent that wrote the file, and assemble again
+2 root-cause.md validates and is stamped:
+ok
+.validated-root-cause
+3 process mode with the stamp:
+wrote <CASE>/process.md (<n> characters)
+4 root-cause.md changed after it passed:
+error: root-cause.md has not passed 'validate.sh <run> root-cause' in its current form; run it, send any problems back to the subagent that wrote the file, and assemble again
+5 a failed validation removes the stamp:
+root-cause.md: cause summary row " conflicting-instructions ": failure class "Twoin-pathsourcesdisagree,andtheonly"stopandask"rulecoversADRconflicts." is not in the tracked list
+no stamps
+exit: 0

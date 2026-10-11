@@ -1,0 +1,24 @@
+{
+  "workflow_runs": [
+    {
+      "check_suite_id": 101724114961,
+      "workflow_id": 376414938,
+      "event": "pull_request"
+    },
+    {
+      "check_suite_id": 101724037779,
+      "workflow_id": 376414938,
+      "event": "pull_request"
+    },
+    {
+      "check_suite_id": 101724037926,
+      "workflow_id": 369653227,
+      "event": "pull_request"
+    },
+    {
+      "check_suite_id": 101724024853,
+      "workflow_id": 369653227,
+      "event": "push"
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+A="$SKILLS/review-agent-pr/scripts/assemble-report.sh"; V="$SKILLS/review-agent-pr/scripts/validate.sh"
+echo "1 verified.md never validated:"; "$A" . report aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa 2>&1 | tail -1
+echo "2 root-cause.md validates and is stamped:"; "$V" . root-cause; ls .validated-*
+echo "3 process mode with the stamp:"; "$A" . process 71 abc1234 2>&1 | tail -1
+echo "4 root-cause.md changed after it passed:"; echo "x" >> root-cause.md; "$A" . process 71 abc1234 2>&1 | tail -1
+echo "5 a failed validation removes the stamp:"; sed -i.bak "/^## Patterns/d" root-cause.md; "$V" . root-cause | tail -1; ls .validated-* 2>/dev/null || echo "no stamps"

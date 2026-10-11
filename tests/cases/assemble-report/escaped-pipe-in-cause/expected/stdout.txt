@@ -1,0 +1,3 @@
+ok
+"failure_class":"test-cannot-fail","cause":"misleading-precedent: copied a | b from the template"
+exit: 0

@@ -1,0 +1,24 @@
+[
+ {
+  "id": 1,
+  "html_url": "https://github.test/c/1",
+  "created_at": "2026-10-08T12:00:00Z",
+  "updated_at": "2026-10-08T12:00:00Z",
+  "author_association": "OWNER",
+  "user": {
+   "login": "owner"
+  },
+  "body": "<!-- agent-pr-review:readiness round=1 -->\n## Readiness review (round 1): Needs answers\n\nRound: 1 \u00b7 Questions: 1 \u00b7 Assumptions: 2 \u00b7 Suggested edits: 1 \u00b7 Spec commit: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb \u00b7 Harness version: 2026.10.06.3\n\n**Check these first:** none\n\n### Questions\n\n#### Q-1: How many retries?\n\n- **Options:** (one per line)\n  - (a) One retry: simplest. Scope: within the issue\n  - (b) Three retries with backoff: matches the client. Scope: within the issue\n  - (c) Configurable: adds a setting. Scope: adds a config key\n- **Edges:** a send that fails on the third retry is reported failed, not retried again;\n  two concurrent sends retry independently; the evidence is `test/send.test.ts`.\n- **Recommendation:** (b), because the client does three.\n- **Reply:** `Decision r1/Q-1: (b)`\n\n### Assumptions\n\n| ID | Assumption | Basis | Makes stale | To correct |\n|---|---|---|---|---|\n| A-1 | The agent puts the retry loop in `src/send.ts` (suggestion) | convention | `docs/send.md:12`<br>`test/send.test.ts:40` (\"sends once\") | `Decision r1/A-1: <your correction>` |\n| A-2 | Errors are logged once | ADR-2 | nothing | `Decision r1/A-2: <your correction>` |\n\n### Suggested edits to the issue\n\n#### E-1: add a verification section\n\nBefore:\n```text\n- [ ] A failed send is retried.\n```\nAfter:\n```text\n- [ ] A failed send is retried up to three times.\n\n## Verification\n- Run the send tests.\n```\n- **Reply:** `Decision r1/E-1: accept`\n\n### Reuse, dependencies and risks\n\n- **Reuse:** import `withBackoff` from `src/util/retry.ts:8`;\n  move `isTransient` from `src/client.ts:40` to `src/util/errors.ts` and import it from both\n  (adds owned path `src/util/errors.ts`)\n- **Dependencies:** none\n\n**Relied on:** `docs/adr/0002.md` \"Logging\"\n"
+ },
+ {
+  "id": 2,
+  "html_url": "https://github.test/c/2",
+  "created_at": "2026-10-08T12:02:00Z",
+  "updated_at": "2026-10-08T12:02:00Z",
+  "author_association": "OWNER",
+  "user": {
+   "login": "owner"
+  },
+  "body": "Decision r1/ALL: accept"
+ }
+]

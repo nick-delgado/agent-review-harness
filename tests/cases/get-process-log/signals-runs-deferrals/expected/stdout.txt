@@ -1,0 +1,26 @@
+tracking-issue: 72
+url: https://github.test/issues/72
+
+======== comment 1 by r at t1 (updated t1) ========
+<!-- agent-pr-review:process pr=70 sha=abc1234 -->
+Round: first
+
+======== comment 2 by r at t2 (updated t2) ========
+<!-- agent-pr-review:incident -->
+## Incident: secrets in a scratch folder
+
+======== decisions and fixes on PR #70 (merged) ========
+response comment 9 by a, posted t3
+<!-- agent-pr-review:response review=a head=b -->
+| SPEC-3 | deferred to #21 | (c) Defer | | |
+
+======== reviewer signals on PR #70 ========
+report abcdef1
+  Confirmed findings after verification: 9 (rejected 4, merged 1).
+  By action: 5 to fix now, 2 waiting, 2 for the owner.
+  withdrawn: | 6c20495/SPEC-1 | major, fix now | fixed | withdrawn | wrong |
+  run: {"pr":70,"total_tokens":99000}
+
+======== deferrals ========
+#70 SPEC-3 deferred to #21 · target is closed (completed)
+exit: 0

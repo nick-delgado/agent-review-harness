@@ -1,0 +1,3 @@
+rm root-cause.md
+cksum < verified.md > .validated-verified
+"$SKILLS/review-agent-pr/scripts/assemble-report.sh" . report aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa | tail -1

@@ -1,0 +1,10 @@
+# The spec has 402 lines, the last two blank. spec-alignment must list it, read to the end.
+echo "not listed:"; "$SKILLS/review-agent-pr/scripts/validate.sh" . reviewers | grep -A1 '^spec-alignment'
+for n in 399 400 402 403; do
+  awk -v n="$n" '{ print } /^### Sources read$/ && !d { print "| `spec/issue-182.md` (read to line " n " of " n ") | the spec |"; d = 1 }' findings/spec-alignment.md > s && cp s findings/spec-alignment.md.$n
+done
+for n in 399 400 402 403; do
+  cp findings/spec-alignment.md.$n findings/spec-alignment.md
+  echo "claim $n: $("$SKILLS/review-agent-pr/scripts/validate.sh" . reviewers | grep -A1 '^spec-alignment' | tr '\n' ' ')"
+done
+rm -f findings/spec-alignment.md.*

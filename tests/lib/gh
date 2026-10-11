@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+# A fake `gh` for the regression tests. It answers `gh api` from JSON files in the case's
+# gh/ directory and applies --jq with jq, so the scripts' own jq programs are tested along
+# with their shell and awk.
+#
+#   GET  repos/{owner}/{repo}/issues/210/comments   ->  gh/issues_210_comments.json
+#   GET  ... -H "Accept: application/vnd.github.diff" -> gh/<key>.diff
+#   POST/PATCH/...                                   ->  logged to $FAKE_GH_LOG; answered
+#                                                        from gh/<METHOD>-<key>.json if present
+# The query string is ignored. A missing file is a 404, as with the real gh.
+
+set -euo pipefail
+
+dir="${FAKE_GH_DIR:?FAKE_GH_DIR is not set}"
+log="${FAKE_GH_LOG:-/dev/null}"
+
+if [ "${1:-}" != "api" ]; then
+  echo "fake gh: only 'gh api' is supported here (got: gh $*)" >&2
+  exit 1
+fi
+shift
+
+method=GET
+jqprog=""
+accept=""
+path=""
+fields=""
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --paginate) ;;
+    --method | -X) method="$2"; shift ;;
+    --jq | -q) jqprog="$2"; shift ;;
+    -H | --header) case "$2" in *diff*) accept=diff ;; esac; shift ;;
+    -f | -F | --field | --raw-field) fields="$fields $2"; shift ;;
+    -*) echo "fake gh: unsupported flag $1" >&2; exit 1 ;;
+    *) path="$1" ;;
+  esac
+  shift
+done
+
+key="${path#repos/\{owner\}/\{repo\}/}"
+key="${key%%\?*}"
+key="$(printf '%s' "$key" | tr '/' '_')"
+
+if [ "$method" != "GET" ]; then
+  printf '%s %s%s\n' "$method" "$key" "$fields" >> "$log"
+  file="$dir/$method-$key.json"
+  if [ ! -f "$file" ]; then
+    file="$(mktemp)"
+    printf '{"html_url":"https://github.test/%s"}\n' "$key" > "$file"
+  fi
+elif [ "$accept" = "diff" ]; then
+  file="$dir/$key.diff"
+else
+  file="$dir/$key.json"
+fi
+
+if [ ! -f "$file" ]; then
+  echo "fake gh: HTTP 404: no $(basename "$file") for: gh api $path" >&2
+  exit 1
+fi
+
+if [ -n "$jqprog" ]; then
+  jq -r "$jqprog" "$file"
+else
+  cat "$file"
+fi

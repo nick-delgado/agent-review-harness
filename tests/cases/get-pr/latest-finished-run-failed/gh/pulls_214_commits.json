@@ -1,0 +1,110 @@
+[
+  {
+    "sha": "1323e5181fa7b0910be980ce4e4a139bb01807b1",
+    "commit": {
+      "message": "fix(web): give each mock API request a connection of its own in the tests (#206)\n\nNode's fetch is Undici and MSW answers it at the socket level, so Undici's\npool held the mock's connections. With Node 26's bundled Undici, a request\naborted mid-response leaves a reopened, unwritten connection that MSW's\ninterceptor passes through to the real network; a later request sent over\nit failed with SocketError: closed when the real connection was refused.\n\nsetup.ts now installs connectionPerRequest (src/mocks/node.ts), an undici\ndispatcher that gives every request its own client, closed after it.\nnode.test.ts reproduces the failure and checks the transport. Declares\nundici as an apps/web devDependency (package.json, package-lock.json).\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01E9XgjhqxuFbLZgmmAx6g66",
+      "author": {
+        "date": "2026-10-07T20:39:46Z"
+      }
+    }
+  },
+  {
+    "sha": "443ca4637e760935e7ac87a922fa7765aa8371ef",
+    "commit": {
+      "message": "test(web): create the useChat tests' api once, not on every render (#206)\n\nFour renderHook tests built a new api on each render, which reruns useChat's\nsession effect on every render. With each request on its own connection, the\nsession answers, and the effect loops until the test times out (43,757\nsession requests in \"keys the reply with the messageId from done\"). Before the\nfix that test's session requests were aborted, or failed on a connection\npassed through to the real network, so the loop never started.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01E9XgjhqxuFbLZgmmAx6g66",
+      "author": {
+        "date": "2026-10-07T20:39:55Z"
+      }
+    }
+  },
+  {
+    "sha": "f86d35715d0e87d5176e149b03a2eed9cbc28604",
+    "commit": {
+      "message": "docs(web): say setup.ts gives fetch a connection per request (#206)\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01E9XgjhqxuFbLZgmmAx6g66",
+      "author": {
+        "date": "2026-10-07T20:39:55Z"
+      }
+    }
+  },
+  {
+    "sha": "f1f04d813d92d8e0e776988c6c337e463803d021",
+    "commit": {
+      "message": "docs(journal): the scroll test's closed socket was a connection MSW passed through (#206)\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01E9XgjhqxuFbLZgmmAx6g66",
+      "author": {
+        "date": "2026-10-07T22:03:38Z"
+      }
+    }
+  },
+  {
+    "sha": "70991af20cff4ef2897344aeaccb7a9a790293a6",
+    "commit": {
+      "message": "test(web): pass the Retry tests' api as renderHook's props, not a hoisted copy of useChat.test's lines (dup:changed; #206)\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01E9XgjhqxuFbLZgmmAx6g66",
+      "author": {
+        "date": "2026-10-07T22:05:23Z"
+      }
+    }
+  },
+  {
+    "sha": "f96a79671850be78e6ac01d6edaa9d6229d751f3",
+    "commit": {
+      "message": "docs(journal): say how the four useChat tests now keep one api (#206)\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01E9XgjhqxuFbLZgmmAx6g66",
+      "author": {
+        "date": "2026-10-07T22:05:34Z"
+      }
+    }
+  },
+  {
+    "sha": "04cb93c15d7cd7b4b5eaaa3dbd499759a1967828",
+    "commit": {
+      "message": "docs(journal): link PR #214 (#206)\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01E9XgjhqxuFbLZgmmAx6g66",
+      "author": {
+        "date": "2026-10-07T22:06:47Z"
+      }
+    }
+  },
+  {
+    "sha": "29c850337cd715df6e8613e01315fe8379784beb",
+    "commit": {
+      "message": "test(web): wait for the closed socket with until, send through createChatApi, and scope the forced test's title to Node 26 (04cb93c/STD-2, SMELL-2, SMELL-4, TEST-1; #206)\n\nThe node.test.ts header now points to node.ts for the mechanism and keeps the Node 24 limit.\ntestUtils.ts's list of files that wait with until now names mocks/node.test.ts.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01E9XgjhqxuFbLZgmmAx6g66",
+      "author": {
+        "date": "2026-10-08T00:40:38Z"
+      }
+    }
+  },
+  {
+    "sha": "c0bc71e56b8640942797a960e6d1f6956353f83b",
+    "commit": {
+      "message": "docs(web): say in ConnectionPerRequest's header why undici's pipelining: 0 Agent wasn't used, labelled untested (04cb93c/SMELL-1; #206)\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01E9XgjhqxuFbLZgmmAx6g66",
+      "author": {
+        "date": "2026-10-08T00:40:38Z"
+      }
+    }
+  },
+  {
+    "sha": "c7c2f77f6782e43ac6e4940fa733ce3fcec17a22",
+    "commit": {
+      "message": "test(web): hoist the api into a const in the two .errors Retry tests, as the decision on #206 says (04cb93c/STD-1; #206)\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01E9XgjhqxuFbLZgmmAx6g66",
+      "author": {
+        "date": "2026-10-08T00:40:38Z"
+      }
+    }
+  },
+  {
+    "sha": "07b1c201f9bf1775d3e3d708a25cdd182c40f8d8",
+    "commit": {
+      "message": "docs(journal): label what the reproduction doesn't show as suspected, narrow the four-tests claim, and record the review round's decisions (04cb93c/SPEC-1, SPEC-2, STD-1, SMELL-1; #206)\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01E9XgjhqxuFbLZgmmAx6g66",
+      "author": {
+        "date": "2026-10-08T00:40:38Z"
+      }
+    }
+  },
+  {
+    "sha": "1290e3a5cbda1d54c34afe469388bd0cb631cf40",
+    "commit": {
+      "message": "docs(journal): name the until mutate run in the evidence (04cb93c/STD-2; #206)\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01E9XgjhqxuFbLZgmmAx6g66",
+      "author": {
+        "date": "2026-10-08T00:44:41Z"
+      }
+    }
+  }
+]

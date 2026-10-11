@@ -1,0 +1,5 @@
+# The spec file has 402 lines, the last two blank: any count from 400 to 402 is the end.
+for n in 399 400 402 403; do
+  printf '## Requirements\n## Open behaviour\n## Conflicts\n## Stale references\n## Scope\n## Sources read\n| `spec/issue-88.md` (read to line %s of %s) | the issue |\n## Not checked\n' "$n" "$n" > run/analysis/spec.md
+  echo "claim $n: $("$SKILLS/review-agent-issue/scripts/validate.sh" run analysis 2>&1)"
+done

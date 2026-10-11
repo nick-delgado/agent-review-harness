@@ -1,0 +1,11 @@
+| Item | Answer | By | Posted | Comment |
+|---|---|---|---|---|
+| r1/A-1 | either a \| b works | owner (repository owner) | 2026-10-08T12:01:00Z | https://github.test/c/3 |
+| r1/E-1 | accept | writer (write access) | 2026-10-08T12:04:00Z | https://github.test/c/6 |
+| r1/E-2 | reject | member (member, write access not confirmed (lookup refused)) | 2026-10-08T12:05:00Z | https://github.test/c/7 |
+| r1/Q-1 | (b) | owner (repository owner) | 2026-10-08T12:07:00Z | https://github.test/c/9 |
+
+Ignored:
+- Q-2 (https://github.test/c/5): outsider has read access, not write
+- Q-1 (https://github.test/c/8): names round 2, not 1
+exit: 0

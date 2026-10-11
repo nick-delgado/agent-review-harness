@@ -1,0 +1,3 @@
+readiness.md: no 'Relied on:' list
+readiness.md: A-1: assumption row needs exactly ID, Assumption, Basis, Makes stale and To correct (write a pipe inside a cell as \|)
+exit: 1

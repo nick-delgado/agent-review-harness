@@ -1,0 +1,24 @@
+[
+ {
+  "id": 1,
+  "html_url": "https://github.test/c/1",
+  "created_at": "2026-10-08T12:00:00Z",
+  "updated_at": "2026-10-08T12:00:00Z",
+  "author_association": "OWNER",
+  "user": {
+   "login": "owner"
+  },
+  "body": "<!-- agent-pr-review:readiness round=2 -->\n## Readiness refresh (round 2): Needs answers\n\nRound: 2 \u00b7 Questions: 1 \u00b7 Assumptions: 1 \u00b7 Suggested edits: 0 \u00b7 Spec commit: cccccccccccccccccccccccccccccccccccccccc \u00b7 Harness version: 2026.10.11\n\n**Check these first:** none\n\n### Questions\n\n#### Q-1: Are errors logged per attempt? (reopens r1/A-2)\n\n- **Options:** (one per line)\n  - (a) Once per send. Scope: within the issue\n  - (b) Once per attempt. Scope: within the issue. Owned paths: + `src/log.ts` (the `logAttempt` helper only), + `test/log.test.ts`\n- **Makes stale:** `docs/send.md:30` (says \"logged once\")\n- **Edges:** none: one send, one log stream.\n- **Recommendation:** (a), because ADR-2 says once.\n- **Reply:** `Decision r2/Q-1: (b)`\n\n### Assumptions\n\n| ID | Assumption | Basis | Makes stale | To correct |\n|---|---|---|---|---|\n| A-1 | Under Q-1 (a), the log line names the send ID | ADR-2 | nothing (the doc has no example) | `Decision r2/A-1: <your correction>` |\n"
+ },
+ {
+  "id": 2,
+  "html_url": "https://github.test/c/2",
+  "created_at": "2026-10-08T12:02:00Z",
+  "updated_at": "2026-10-08T12:02:00Z",
+  "author_association": "OWNER",
+  "user": {
+   "login": "owner"
+  },
+  "body": "Decision r2/Q-1: (b)"
+ }
+]

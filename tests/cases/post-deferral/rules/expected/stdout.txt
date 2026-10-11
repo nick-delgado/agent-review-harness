@@ -1,0 +1,13 @@
+bad marker:
+error: the first line must be <!-- agent-pr-review:deferred pr=<n> review=<commit> finding=<ID> -->
+closed issue:
+error: #22 is closed, not an open issue; ask the owner where the finding should go instead
+a pull request:
+error: #23 is a pull request, not an open issue; ask the owner where the finding should go instead
+already noted:
+already noted on #21
+posted:
+created https://github.test/issues_24_comments
+writes:
+POST issues_24_comments body=@note.md
+exit: 0

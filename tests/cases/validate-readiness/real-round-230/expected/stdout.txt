@@ -1,0 +1,16 @@
+readiness.md: Q-1: no Makes stale line (the lines any option makes wrong, or "nothing")
+readiness.md: Q-2: no Makes stale line (the lines any option makes wrong, or "nothing")
+readiness.md: Q-3: no Makes stale line (the lines any option makes wrong, or "nothing")
+readiness.md: Q-4: no Makes stale line (the lines any option makes wrong, or "nothing")
+readiness.md: Q-5: no Makes stale line (the lines any option makes wrong, or "nothing")
+readiness.md: Q-6: no Makes stale line (the lines any option makes wrong, or "nothing")
+readiness.md: line 27 widens the owned paths by line numbers; name whole files, and the files the change forces (tests, docs)
+readiness.md: line 38 widens the owned paths by line numbers; name whole files, and the files the change forces (tests, docs)
+readiness.md: line 39 widens the owned paths by line numbers; name whole files, and the files the change forces (tests, docs)
+readiness.md: line 40 widens the owned paths by line numbers; name whole files, and the files the change forces (tests, docs)
+readiness.md: E-1: its Before text is not in the issue description
+readiness.md: E-3: its Before text is not in the issue description
+readiness.md: E-4: its Before text is not in the issue description
+readiness.md: E-5: its Before text is not in the issue description
+readiness.md: E-6: its Before text is not in the issue description
+exit: 1

@@ -353,6 +353,11 @@ skills/
     references/harness-changes.md    the harness's own changes, with IDs and targets, to measure
     scripts/get-process-log.sh       prints the tracking issue, responses, reviewer signals and deferrals
 install.sh
+tests/
+  run.sh                             the regression tests (see "Contributing: tests")
+  lib/gh                             a fake gh that answers from recorded JSON
+  cases/<script>/<case>/             one case: cmd, inputs, gh/, expected/
+  fixtures/                          shared inputs (a recorded review run)
 ```
 
 There are no tool-specific subagent definition files. The three tools keep those in
@@ -401,6 +406,20 @@ every skill, so all skills always show the release they came with.
 If a project commits copies of these skills (for example under `.agents/skills/`), those
 copies do not update themselves: refresh them with `npx skills update` or `install.sh`, or
 keep the skills out of the project and install them per user.
+
+## Contributing: tests
+
+`tests/run.sh` runs the regression tests: every script against recorded cases, offline (a
+fake `gh` answers from each case's JSON and applies the script's own `--jq` programs), plus
+checks that every script parses, that shared copies are identical and that all skills carry
+one version. CI runs it on Linux and macOS, since the awk and sed differ.
+
+- Run it before every commit. A failure that is a deliberate change: `tests/run.sh --update
+  <case>`, then read the diff of `expected/` before committing it.
+- When a bug is reported, first add a case that reproduces it, from the real data where
+  there is some (record the comments or PR as JSON into the case's `gh/`), then fix it.
+- Layout: `tests/cases/<script>/<case>/` holds `cmd`, inputs, `gh/` and `expected/`; see the
+  header of `tests/run.sh`.
 
 ## Contributing: the generality check
 

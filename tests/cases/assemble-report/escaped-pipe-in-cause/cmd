@@ -1,0 +1,6 @@
+# A cause with an escaped pipe keeps its columns, and is unescaped in findings.json.
+awk 'BEGIN { FS = OFS = "|" } /^\| *TEST-1 / && !d { $5 = " misleading-precedent: copied `a \\| b` from the template "; d = 1 } { print }' root-cause.md > rc && mv rc root-cause.md
+"$SKILLS/review-agent-pr/scripts/validate.sh" . root-cause
+cksum < verified.md > .validated-verified
+"$SKILLS/review-agent-pr/scripts/assemble-report.sh" . report aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa > /dev/null
+grep -o '"id":"TEST-1".*' findings.json | grep -o '"failure_class":"[^"]*","cause":"[^"]*"'

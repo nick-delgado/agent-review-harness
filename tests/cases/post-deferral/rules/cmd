@@ -1,0 +1,8 @@
+P="$SKILLS/address-pr-review/scripts/post-deferral.sh"
+note() { printf '<!-- agent-pr-review:deferred pr=70 review=abc1234 finding=%s -->\n**Deferred to this issue from PR #70**\n' "$1" > note.md; }
+echo "bad marker:"; printf 'no marker\n' > note.md; "$P" 24 note.md || true
+echo "closed issue:"; note SPEC-1; "$P" 22 note.md || true
+echo "a pull request:"; "$P" 23 note.md || true
+echo "already noted:"; note SPEC-3; "$P" 21 note.md
+echo "posted:"; note SPEC-4; "$P" 24 note.md
+echo "writes:"; cat gh-writes.log

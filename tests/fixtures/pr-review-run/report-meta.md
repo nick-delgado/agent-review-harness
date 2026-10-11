@@ -1,0 +1,8 @@
+- Reviewed commit: `d34b6dfc3cd831ec281ef7f35e64d8aa4cc0fb1e` against `main`
+- Reviewing agent and model: Claude Code, claude-opus-5-5 (orchestrator and all subagents)
+- Reviewers: standards, code-smells, spec-alignment, test-adequacy; verifier; root-cause analyst
+- Isolation: parallel subagents with fresh context
+- Tests, linters and builds were not run by this review; CI status is reported as found. Every "would a test fail" judgement is from reading the code, not from a mutation run.
+- Line citations: citations checked: 124, invalid: 0, not resolvable to a file: 0
+- This comment replaces the previous report on this commit (by another reviewing agent, which reported no findings). The first round's report on `6c20495` was recovered from this comment's edit history.
+- The test-adequacy reviewer did not produce its behaviour-coverage table; that section below says "Not produced".

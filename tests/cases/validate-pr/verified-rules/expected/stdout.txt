@@ -1,0 +1,3 @@
+verified.md: SPEC-1: Spec moved, so the action must be needs owner decision
+verified.md: SPEC-2: a blocker cannot be deferred to another issue
+exit: 1

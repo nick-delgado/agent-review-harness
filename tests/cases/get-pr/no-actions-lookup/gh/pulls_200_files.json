@@ -1,0 +1,50 @@
+[
+  {
+    "filename": "CLAUDE.md",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1
+  },
+  {
+    "filename": "docs/journal/2026-10-06-eval-results-outlive-the-worktree.md",
+    "status": "added",
+    "additions": 46,
+    "deletions": 0
+  },
+  {
+    "filename": "docs/journal/README.md",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 0
+  },
+  {
+    "filename": "packages/evals/src/cli-args.ts",
+    "status": "modified",
+    "additions": 14,
+    "deletions": 2
+  },
+  {
+    "filename": "packages/evals/src/cli.ts",
+    "status": "modified",
+    "additions": 19,
+    "deletions": 9
+  },
+  {
+    "filename": "packages/evals/src/index.ts",
+    "status": "modified",
+    "additions": 2,
+    "deletions": 0
+  },
+  {
+    "filename": "packages/evals/src/results-copy.ts",
+    "status": "added",
+    "additions": 147,
+    "deletions": 0
+  },
+  {
+    "filename": "packages/evals/test/results-copy.test.ts",
+    "status": "added",
+    "additions": 269,
+    "deletions": 0
+  }
+]

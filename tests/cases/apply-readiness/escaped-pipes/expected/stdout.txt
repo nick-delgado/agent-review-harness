@@ -1,0 +1,4 @@
+applied and skipped items are listed in <CASE>/run/applied.md
+open: 0
+to check: 0
+exit: 0

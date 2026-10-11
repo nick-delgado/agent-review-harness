@@ -1,0 +1,8 @@
+not listed:
+spec-alignment.md:
+  spec/issue-182.md is not under Sources read: read it to its end and list it as "(read to line 402 of 402)"
+claim 399: spec-alignment.md:   spec/issue-182.md was read to line 399 of 399, but it has 402 lines: read the rest from the file itself, in line ranges 
+claim 400: spec-alignment.md: ok test-adequacy--1.md: ok 
+claim 402: spec-alignment.md: ok test-adequacy--1.md: ok 
+claim 403: spec-alignment.md:   spec/issue-182.md was read to line 403 of 403, but it has 402 lines: read the rest from the file itself, in line ranges 
+exit: 0

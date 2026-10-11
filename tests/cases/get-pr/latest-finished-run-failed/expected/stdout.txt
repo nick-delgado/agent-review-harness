@@ -1,0 +1,15 @@
+pr: #214 fix(web): give each mock API request a connection of its own in the tests (#206)
+url: https://github.com/nick-delgado/serverless-ai-scheduling/pull/214
+state: closed
+head: fix/206-mock-fetch-socket @ 07b1c201f9bf1775d3e3d708a25cdd182c40f8d8
+base: main @ 66c0981dcf56026704d9f6d4aa454b2055458e32
+size: 12 files, +278 -13, 12 commits
+mergeable: unknown
+ci: failing: Lint, typecheck, test, Seen-failing evidence
+closes: #206 
+check	Journal links	completed	success
+check	Lint, typecheck, test	completed	cancelled
+check	Seen-failing evidence	completed	failure
+check	cfn-lint	completed	success
+check	cfn-lint	completed	success
+exit: 0

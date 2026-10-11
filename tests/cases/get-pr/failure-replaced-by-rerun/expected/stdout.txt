@@ -1,0 +1,16 @@
+pr: #200 feat(evals): also write each run's results outside the checkout (#195)
+url: https://github.com/nick-delgado/serverless-ai-scheduling/pull/200
+state: closed
+head: feat/195-eval-results-copy @ 1cc72702878f57e9faf5be042182f8dd11304f08
+base: main @ de74622a317454c3622353c38f7e663070d9214a
+size: 8 files, +499 -12, 10 commits
+mergeable: unknown
+ci: passing (Journal links, Lint, typecheck, test, Seen-failing evidence, cfn-lint)
+closes: #195 
+check	Journal links	completed	success
+check	Lint, typecheck, test	completed	success
+check	Lint, typecheck, test	completed	success
+check	Seen-failing evidence	completed	success
+check	cfn-lint	completed	success
+check	cfn-lint	completed	success
+exit: 0

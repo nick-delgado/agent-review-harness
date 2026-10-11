@@ -1,0 +1,16 @@
+direction-document commits since work began: 1
+direction-document commits since readiness: 1
+written: <CASE>/run/spec-moves.md, <CASE>/run/spec-moves.patch
+# Spec moves
+
+Direction documents checked: `docs/` 
+
+## Readiness of the PR's issues
+- #19: review (round 1): Ready with assumptions · settled against `36327e0` · answers applied: yes
+
+## Changed on `main` since the work began (`36327e0`, first commit 2026-10-02T12:00:00Z)
+- `63f6b3a` 2026-10-03 PRD: amend FR-1
+
+## Changed on `main` since the readiness review settled the issue (`36327e0`)
+- `63f6b3a` 2026-10-03 PRD: amend FR-1
+exit: 0

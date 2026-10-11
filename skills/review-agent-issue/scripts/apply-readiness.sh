@@ -75,13 +75,21 @@ answers="$("$here/get-issue-decisions.sh" "$n" "$k" | awk '
   function nothing(s) { return tolower(trim(s)) ~ /^(nothing|none|n\/a|-|—)?([ .:;(]|$)/ }
   # Mentions of this round'"'"'s options ("Q-1 (a)", "Q-1 (a) or (b)") that name none of the
   # options the owner chose: the text was written for another answer.
-  function contradicts(s, who,   m, q, letters) {
+  # Text that covers several options in turn ("Under Q-1 (a) or (b) ...; under Q-1 (c) ...")
+  # is fine as long as one of its mentions includes the chosen option.
+  function contradicts(s, who,   m, q, letters, seen, nq2, qs, i) {
+    split("", seen); nq2 = 0
     while (match(s, /(^|[^\/A-Za-z0-9])Q-[0-9]+ \([a-z]\)(( or | and |, )\([a-z]\))*/)) {
       m = substr(s, RSTART, RLENGTH); s = substr(s, RSTART + RLENGTH)
       q = m; sub(/^[^Q]*/, "", q); sub(/ .*/, "", q)
       letters = m; sub(/^[^(]*/, "", letters); gsub(/[^a-z]/, "", letters)
-      if ((q in chosenq) && chosenq[q] != "" && index(letters, chosenq[q]) == 0)
-        checks = checks "- " who " refers to " q " (" letters "), but (" chosenq[q] ") was chosen: check that it still holds\n"
+      if (!(q in seen)) qs[++nq2] = q
+      seen[q] = seen[q] letters
+    }
+    for (i = 1; i <= nq2; i++) {
+      q = qs[i]
+      if ((q in chosenq) && chosenq[q] != "" && index(seen[q], chosenq[q]) == 0)
+        checks = checks "- " who " mentions only " q " (" seen[q] "), but (" chosenq[q] ") was chosen: check whether it still applies\n"
     }
   }
 

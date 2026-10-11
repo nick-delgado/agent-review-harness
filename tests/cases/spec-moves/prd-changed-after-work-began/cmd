@@ -1,0 +1,18 @@
+# A repository whose PRD changed on main after the PR's work began and after the issue's
+# readiness review. Fixed dates and author, so the commit hashes are the same everywhere.
+export GIT_AUTHOR_NAME=t GIT_AUTHOR_EMAIL=t@test GIT_COMMITTER_NAME=t GIT_COMMITTER_EMAIL=t@test
+at() { export GIT_AUTHOR_DATE="2026-10-0$1T12:00:00Z" GIT_COMMITTER_DATE="2026-10-0$1T12:00:00Z"; }
+git init -q --bare origin.git
+git init -q -b main work && cd work && git remote add origin ../origin.git
+mkdir docs && echo "FR-1: one retry" > docs/PRD.md && echo x > app.txt
+at 1; git add . && git commit -qm init && git push -q origin main
+settled="$(git rev-parse HEAD)"
+git checkout -q -b feat; echo y > feature.txt; at 2; git add . && git commit -qm "feat: start"
+git checkout -q main; echo "FR-1: three retries" > docs/PRD.md; at 3; git commit -qam "PRD: amend FR-1"
+echo z >> app.txt; at 4; git commit -qam "other work"; git push -q origin main
+git checkout -q feat; at 5; git merge -q --no-edit main; echo w >> feature.txt; at 6; git commit -qam "feat: more"
+cd ..
+mkdir -p run/spec && git -C work worktree add -q --detach "$PWD/run/worktree" feat
+printf '# Issue #19: x\n\n## Comments\n\n### owner, t\n\n<!-- agent-pr-review:readiness round=1 -->\n## Readiness review (round 1): Ready with assumptions\nRound: 1 · Spec commit: %s\n\n### owner, t\n\n<!-- agent-pr-review:readiness-applied round=1 -->\n' "$settled" > run/spec/issue-19.md
+"$SKILLS/review-agent-pr/scripts/spec-moves.sh" run main docs/
+cat run/spec-moves.md
