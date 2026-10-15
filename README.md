@@ -348,6 +348,7 @@ skills/
     scripts/get-decisions.sh         lists the owner's Decision lines for a review
     scripts/post-response.sh         posts the response as a new PR comment
     scripts/post-deferral.sh         notes a deferred finding on its target issue
+    scripts/broad-test-names.sh      lists test names a fix round added that claim more than one case
   improve-agent-process/
     SKILL.md
     references/harness-changes.md    the harness's own changes, with IDs and targets, to measure

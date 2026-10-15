@@ -1,0 +1,18 @@
+export GIT_AUTHOR_NAME=t GIT_AUTHOR_EMAIL=t@test GIT_COMMITTER_NAME=t GIT_COMMITTER_EMAIL=t@test GIT_AUTHOR_DATE=2026-10-01T12:00:00Z GIT_COMMITTER_DATE=2026-10-01T12:00:00Z
+git init -q repo && cd repo
+printf 'it("keeps the old name", () => {})\n' > a.test.ts; git add . && git commit -qm reviewed; reviewed="$(git rev-parse HEAD)"
+cat > a.test.ts <<'T'
+it("keeps the old name", () => {})
+it("rejects every malformed date", () => {})
+test.each([1, 2])("retries twice on a 503", () => {})
+describe('all zones', () => {})
+T
+printf 'def test_never_double_books():\n    pass\ndef test_books_one_slot():\n    pass\n' > test_book.py
+printf 'func TestAlwaysUTC(t *testing.T) {}\n' > zone_test.go
+git add . && git commit -qm fixes; head="$(git rev-parse HEAD)"
+echo "== broad names:"; "$SKILLS/address-pr-review/scripts/broad-test-names.sh" "$reviewed" "$head"
+P="$SKILLS/address-pr-review/scripts/post-response.sh"
+printf '<!-- agent-pr-review:response review=%s head=%s -->\n- **Broad test names:** "rejects every malformed date": the table covers each format\n' "$reviewed" "$head" > ../response.md
+echo "== response leaves three out:"; "$P" 9 ../response.md || true
+printf -- '- "all zones", "never double books", "AlwaysUTC": each backed by its table test\n' >> ../response.md
+echo "== response names them all:"; "$P" 9 ../response.md

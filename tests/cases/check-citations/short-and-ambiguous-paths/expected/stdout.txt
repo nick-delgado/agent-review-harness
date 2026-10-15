@@ -1,0 +1,6 @@
+citations checked: 3, invalid: 1, not resolvable to a file: 1
+invalid citations (line numbers must be lines of the file at the PR head, not positions in diff.patch):
+  verified.md: src/a/index.ts:40 (the file has 20 lines)
+not resolvable to one file (write each as its full path from the repository root):
+  verified.md: index.ts:3 (ambiguous: src/a/index.ts, src/b/index.ts)
+exit: 1

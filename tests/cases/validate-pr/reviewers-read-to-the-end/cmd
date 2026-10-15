@@ -1,10 +1,14 @@
 # The spec has 402 lines, the last two blank. spec-alignment must list it, read to the end.
 echo "not listed:"; "$SKILLS/review-agent-pr/scripts/validate.sh" . reviewers | grep -A1 '^spec-alignment'
-for n in 399 400 402 403; do
+for n in 399 400 402 403 404; do
   awk -v n="$n" '{ print } /^### Sources read$/ && !d { print "| `spec/issue-182.md` (read to line " n " of " n ") | the spec |"; d = 1 }' findings/spec-alignment.md > s && cp s findings/spec-alignment.md.$n
 done
-for n in 399 400 402 403; do
+for n in 399 400 402 403 404; do
   cp findings/spec-alignment.md.$n findings/spec-alignment.md
   echo "claim $n: $("$SKILLS/review-agent-pr/scripts/validate.sh" . reviewers | grep -A1 '^spec-alignment' | tr '\n' ' ')"
 done
 rm -f findings/spec-alignment.md.*
+# A reviewer that does not work from the spec (code smells) may list it without an extent.
+cp findings/spec-alignment.md.keep findings/spec-alignment.md 2>/dev/null || true
+awk '{ print } /^### Sources read$/ && !d { print "| `spec/issue-182.md` | to see what the PR is for |"; d = 1 }' findings/code-smells--1.md > s && mv s findings/code-smells--1.md
+echo "code smells lists the spec without an extent: $("$SKILLS/review-agent-pr/scripts/validate.sh" . reviewers | grep -A1 '^code-smells--1' | tr '\n' ' ')"

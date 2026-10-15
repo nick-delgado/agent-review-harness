@@ -1,5 +1,6 @@
 claim 399: spec.md: spec/issue-88.md was read to line 399 of 399, but it has 402 lines: read the rest from the file itself, in line ranges
 claim 400: ok
 claim 402: ok
-claim 403: spec.md: spec/issue-88.md was read to line 403 of 403, but it has 402 lines: read the rest from the file itself, in line ranges
+claim 403: ok
+claim 404: spec.md: spec/issue-88.md was read to line 404 of 404, but it has 402 lines: read the rest from the file itself, in line ranges
 exit: 0

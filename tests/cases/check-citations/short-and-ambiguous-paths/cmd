@@ -1,0 +1,12 @@
+# A worktree with two index.ts files and one retry.ts.
+export GIT_AUTHOR_NAME=t GIT_AUTHOR_EMAIL=t@test GIT_COMMITTER_NAME=t GIT_COMMITTER_EMAIL=t@test
+git init -q worktree && cd worktree && mkdir -p src/a src/b src/util
+for f in src/a/index.ts src/b/index.ts src/util/retry.ts; do seq 1 20 > "$f"; done
+git add . && git commit -qm init && cd ..
+cat > verified.md <<'V'
+- full path: `src/util/retry.ts:5`
+- unique short path: `retry.ts:6`
+- ambiguous short path: `index.ts:3`
+- past the end: `src/a/index.ts:40`
+V
+"$SKILLS/review-agent-pr/scripts/check-citations.sh" --strict . verified.md

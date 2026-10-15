@@ -1,0 +1,14 @@
+== broad names:
+a.test.ts:2: rejects every malformed date  [every]
+a.test.ts:4: all zones  [all]
+test_book.py:1: never double books  [never]
+zone_test.go:1: AlwaysUTC  [always]
+== response leaves three out:
+error: the fixes added or changed test names that claim more than one case, and the response does not mention them:
+  a.test.ts:4: all zones  [all]
+  test_book.py:1: never double books  [never]
+  zone_test.go:1: AlwaysUTC  [always]
+Narrow each name to what its test checks, or keep it and quote it under "Broad test names" with the check that backs it.
+== response names them all:
+created https://github.test/issues_9_comments
+exit: 0

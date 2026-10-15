@@ -4,5 +4,7 @@ spec-alignment.md:
 claim 399: spec-alignment.md:   spec/issue-182.md was read to line 399 of 399, but it has 402 lines: read the rest from the file itself, in line ranges 
 claim 400: spec-alignment.md: ok test-adequacy--1.md: ok 
 claim 402: spec-alignment.md: ok test-adequacy--1.md: ok 
-claim 403: spec-alignment.md:   spec/issue-182.md was read to line 403 of 403, but it has 402 lines: read the rest from the file itself, in line ranges 
+claim 403: spec-alignment.md: ok test-adequacy--1.md: ok 
+claim 404: spec-alignment.md:   spec/issue-182.md was read to line 404 of 404, but it has 402 lines: read the rest from the file itself, in line ranges 
+code smells lists the spec without an extent: code-smells--1.md: ok code-smells--2.md: ok 
 exit: 0
