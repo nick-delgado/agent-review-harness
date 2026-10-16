@@ -1,0 +1,10 @@
+# Since the reviewed commit: three new source files, a new test, a changed source file.
+export GIT_AUTHOR_NAME=t GIT_AUTHOR_EMAIL=t@test GIT_COMMITTER_NAME=t GIT_COMMITTER_EMAIL=t@test GIT_AUTHOR_DATE=2026-10-01T12:00:00Z GIT_COMMITTER_DATE=2026-10-01T12:00:00Z
+git init -q -b main repo && cd repo
+mkdir -p src test && seq 1 10 > src/app.ts && git add . && git commit -qm base
+git checkout -q -b feat && echo "export const a = 1" > src/first.ts && git add . && git commit -qm "pr work"
+reviewed="$(git rev-parse HEAD)"
+for f in src/zeta.ts src/alpha.ts src/mid/beta.ts; do mkdir -p "$(dirname "$f")"; seq 1 5 > "$f"; done
+seq 1 30 > test/alpha.test.ts; echo 11 >> src/app.ts
+git add . && git commit -qm fixes
+"$SKILLS/review-agent-pr/scripts/diff-size.sh" "$reviewed" HEAD . main

@@ -1,0 +1,10 @@
+expanded to full paths: index.ts:3-4 retry.ts:6 
+citations checked: 5, invalid: 0, not resolvable to a file: 1
+not resolvable to one file (write each as its full path from the repository root):
+  verified.md: x.ts:2 (ambiguous: lib/x.ts, src/b/x.ts)
+--- verified.md after:
+- full path: `src/util/retry.ts:5`, and `src/a/index.ts:4` already full
+- unique short path: `src/util/retry.ts:6`, next to its full form `src/util/retry.ts:6`
+- ambiguous, but only one candidate changed: `src/a/index.ts:3-4`
+- x.ts:2 is ambiguous and neither candidate changed
+exit: 0
